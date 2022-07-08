@@ -60,7 +60,9 @@ class _MessageListState extends State<MessageList> {
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Stack(
         children: <Widget>[
-          Column(
+          Container(
+            color: widget.messageListOptions.backgroundColor,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Expanded(
@@ -75,33 +77,33 @@ class _MessageListState extends State<MessageList> {
                       },
                       controller: refreshController,
                       child: ListView.builder(
-                      controller: scrollController,
-                      reverse: true,
-                      itemCount: widget.messages.length,
-                      itemBuilder: (BuildContext context, int i) {
-                        final ChatMessage? previousMessage =
-                        i < widget.messages.length - 1
-                            ? widget.messages[i + 1]
-                            : null;
-                        final ChatMessage? nextMessage =
-                        i > 0 ? widget.messages[i - 1] : null;
-                        final ChatMessage message = widget.messages[i];
+                        controller: scrollController,
+                        reverse: true,
+                        itemCount: widget.messages.length,
+                        itemBuilder: (BuildContext context, int i) {
+                          final ChatMessage? previousMessage =
+                              i < widget.messages.length - 1
+                                  ? widget.messages[i + 1]
+                                  : null;
+                          final ChatMessage? nextMessage =
+                              i > 0 ? widget.messages[i - 1] : null;
+                          final ChatMessage message = widget.messages[i];
 
-                        return Container(
-                          color: widget.messageListOptions.backgroundColor,
-                          child: Column(
+                          return Column(
                             children: <Widget>[
                               if (_shouldShowDateSeparator(
                                   previousMessage, message))
-                                widget.messageListOptions.dateSeparatorBuilder !=
-                                    null
+                                widget.messageListOptions
+                                            .dateSeparatorBuilder !=
+                                        null
                                     ? widget.messageListOptions
-                                    .dateSeparatorBuilder!(message.createdAt)
+                                            .dateSeparatorBuilder!(
+                                        message.createdAt)
                                     : DefaultDateSeparator(
-                                  date: message.createdAt,
-                                  messageListOptions:
-                                  widget.messageListOptions,
-                                ),
+                                        date: message.createdAt,
+                                        messageListOptions:
+                                            widget.messageListOptions,
+                                      ),
                               if (widget.messageOptions.messageRowBuilder !=
                                   null) ...<Widget>[
                                 widget.messageOptions.messageRowBuilder!(
@@ -116,17 +118,19 @@ class _MessageListState extends State<MessageList> {
                                   previousMessage: previousMessage,
                                   currentUser: widget.currentUser,
                                   messageOptions: widget.messageOptions,
-                                  lastMessageBottomPadding: widget.messageListOptions.lastMessageBottomPadding,
+                                  lastMessageBottomPadding: widget
+                                      .messageListOptions
+                                      .lastMessageBottomPadding,
                                 ),
                             ],
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
-                ),
-                if (widget.typingUsers != null && widget.typingUsers!.isNotEmpty)
+                if (widget.typingUsers != null &&
+                    widget.typingUsers!.isNotEmpty)
                   ...widget.typingUsers!.map((ChatUser user) {
                     if (widget.messageListOptions.typingBuilder != null) {
                       return widget.messageListOptions.typingBuilder!(user);
@@ -149,6 +153,7 @@ class _MessageListState extends State<MessageList> {
                   widget.messageListOptions.chatFooterBuilder!,
               ],
             ),
+          ),
           if (topReached &&
               widget.messageListOptions.loadEarlierBuilder != null)
             Positioned(
