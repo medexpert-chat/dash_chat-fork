@@ -87,36 +87,39 @@ class _MessageListState extends State<MessageList> {
                         i > 0 ? widget.messages[i - 1] : null;
                         final ChatMessage message = widget.messages[i];
 
-                        return Column(
-                          children: <Widget>[
-                            if (_shouldShowDateSeparator(
-                                previousMessage, message))
-                              widget.messageListOptions.dateSeparatorBuilder !=
-                                  null
-                                  ? widget.messageListOptions
-                                  .dateSeparatorBuilder!(message.createdAt)
-                                  : DefaultDateSeparator(
-                                date: message.createdAt,
-                                messageListOptions:
-                                widget.messageListOptions,
-                              ),
-                            if (widget.messageOptions.messageRowBuilder !=
-                                null) ...<Widget>[
-                              widget.messageOptions.messageRowBuilder!(
-                                message,
-                                previousMessage,
-                                nextMessage,
-                              ),
-                            ] else
-                              MessageRow(
-                                message: widget.messages[i],
-                                nextMessage: nextMessage,
-                                previousMessage: previousMessage,
-                                currentUser: widget.currentUser,
-                                messageOptions: widget.messageOptions,
-                                lastMessageBottomPadding: widget.messageListOptions.lastMessageBottomPadding,
-                              ),
-                          ],
+                        return Container(
+                          color: widget.messageListOptions.backgroundColor,
+                          child: Column(
+                            children: <Widget>[
+                              if (_shouldShowDateSeparator(
+                                  previousMessage, message))
+                                widget.messageListOptions.dateSeparatorBuilder !=
+                                    null
+                                    ? widget.messageListOptions
+                                    .dateSeparatorBuilder!(message.createdAt)
+                                    : DefaultDateSeparator(
+                                  date: message.createdAt,
+                                  messageListOptions:
+                                  widget.messageListOptions,
+                                ),
+                              if (widget.messageOptions.messageRowBuilder !=
+                                  null) ...<Widget>[
+                                widget.messageOptions.messageRowBuilder!(
+                                  message,
+                                  previousMessage,
+                                  nextMessage,
+                                ),
+                              ] else
+                                MessageRow(
+                                  message: widget.messages[i],
+                                  nextMessage: nextMessage,
+                                  previousMessage: previousMessage,
+                                  currentUser: widget.currentUser,
+                                  messageOptions: widget.messageOptions,
+                                  lastMessageBottomPadding: widget.messageListOptions.lastMessageBottomPadding,
+                                ),
+                            ],
+                          ),
                         );
                       },
                     ),

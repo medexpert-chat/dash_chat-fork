@@ -3,6 +3,7 @@ part of dash_chat_2;
 /// {@category Customization}
 class MessageListOptions {
   const MessageListOptions({
+    this.backgroundColor = Colors.white,
     this.showDateSeparator = true,
     this.dateSeparatorFormat,
     this.dateSeparatorBuilder,
@@ -15,6 +16,9 @@ class MessageListOptions {
     this.typingBuilder,
     this.lastMessageBottomPadding = 5,
   });
+
+  /// Color of list of messages
+  final Color backgroundColor;
 
   /// If you want to who a date separator between messages of different dates
   final bool showDateSeparator;

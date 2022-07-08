@@ -222,8 +222,8 @@
         <entry key="url_launcher">
           <value>
             <list>
-              <option value="$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-6.0.11/lib" />
               <option value="$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-6.0.10/lib" />
+              <option value="$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-6.0.11/lib" />
             </list>
           </value>
         </entry>
