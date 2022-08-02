@@ -46,6 +46,7 @@ class _MessageListState extends State<MessageList> {
   bool topReached = false;
   late ScrollController scrollController;
   RefreshController refreshController = RefreshController();
+  List<ChatMessage> highlitedMessages = [];
 
   @override
   void initState() {
@@ -113,6 +114,24 @@ class _MessageListState extends State<MessageList> {
                                 ),
                               ] else
                                 MessageRow(
+                                  onTap: (message) => {
+                                    setState(() => {
+                                          if (!highlitedMessages
+                                              .contains(message))
+                                            {
+                                              highlitedMessages.clear(),
+                                              highlitedMessages.add(message),
+                                            }
+                                          else
+                                            {
+                                              highlitedMessages.clear(),
+                                            }
+                                        }),
+                                  },
+                                  color: highlitedMessages
+                                          .contains(widget.messages[i])
+                                      ? Color.fromRGBO(21, 204, 171, 0.05)
+                                      : Colors.transparent,
                                   message: widget.messages[i],
                                   nextMessage: nextMessage,
                                   previousMessage: previousMessage,

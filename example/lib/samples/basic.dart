@@ -13,11 +13,16 @@ class _BasicState extends State<Basic> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Basic example'),
       ),
       body: DashChat(
+        messageOptions: MessageOptions(
+          showOtherUsersAvatar: false,
+          showOtherUsersName: false,
+        ),
         onRefresh: (context) => {},
 
         currentUser: user,

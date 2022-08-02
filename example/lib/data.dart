@@ -79,36 +79,6 @@ List<ChatMessage> basicSample = <ChatMessage>[
     createdAt: DateTime(2021, 01, 30, 16, 34),
     status: MessageStatus.read,
   ),
-  ChatMessage(
-    text: 'Hey!sdfasdgfasdgjgadsgfadsgfhadshfagshdgfasdhfdsgfhadshfagshdgfasdhfdsgfhadshfagshdgfasdhfdsgfhadshfagshdgfasdhfdsgfhadshfagshdfdsjhadsghhgadsghsadhgkasddashadsh',
-    user: user,
-    createdAt: DateTime(2021, 01, 30, 15, 50),
-    status: MessageStatus.read,
-    medias: <ChatMedia>[
-      ChatMedia(
-        url: 'https://hsto.org/webt/5d/ad/ef/5dadef7d0eeaf290713181.jpeg',
-        type: MediaType.image,
-        fileName: 'image.png',
-      ),
-      ChatMedia(
-        url: 'http://wallpapers-images.ru/2560x1600/bridges/wallpapers/bridges-wallpapers-2560x1600-00019.jpg',
-        type: MediaType.image,
-        fileName: 'image.png',
-      ),
-    ],
-  ),
-  ChatMessage(
-    user: user,
-    createdAt: DateTime(2021, 01, 30, 15, 50),
-    status: MessageStatus.read,
-    medias: <ChatMedia>[
-      ChatMedia(
-        url: 'http://wallpapers-images.ru/2560x1600/bridges/wallpapers/bridges-wallpapers-2560x1600-00019.jpg',
-        type: MediaType.image,
-        fileName: 'image.png',
-      ),
-    ],
-  ),
 ];
 
 List<ChatMessage> headerMessage = <ChatMessage>[
