@@ -84,7 +84,8 @@ class _InputToolbarState extends State<InputToolbar> {
               ),
             ),
             if (widget.inputOptions.trailing != null &&
-                widget.inputOptions.showTraillingBeforeSend)
+                widget.inputOptions.showTraillingBeforeSend &&
+                textController.text.isEmpty)
               ...widget.inputOptions.trailing!,
             if (widget.inputOptions.alwaysShowSend ||
                 textController.text.isNotEmpty)

@@ -45,12 +45,23 @@ class _BasicState extends State<Basic> {
               ),
             ),
           ],
-          sendButtonBuilder: (callback) => Padding(
-            padding: const EdgeInsets.only(left: 3, top: 20, right: 3, bottom: 16),
-            child: GestureDetector(
-              child: Icon(Icons.send),
-              onTap: () => callback(),
-            ),
+          sendButtonBuilder: (callback) => Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 3),
+                child: Text(
+                  '${_textController.text.length}/$maxInputLength',
+                  style: const TextStyle(color: Colors.grey, fontSize: 10),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 3, top: 20, right: 3, bottom: 16),
+                child: GestureDetector(
+                  child: Icon(Icons.send),
+                  onTap: () => callback(),
+                ),
+              ),
+            ],
           ),
           leading: [
             Padding(
@@ -67,7 +78,7 @@ class _BasicState extends State<Basic> {
             ),
             color: Colors.white,
           ),
-          alwaysShowSend: true,
+          alwaysShowSend: false,
           inputMinLines: 1,
           inputMaxLines: 4,
           maxInputLength: maxInputLength,
