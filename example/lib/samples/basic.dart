@@ -24,6 +24,8 @@ class _BasicState extends State<Basic> {
         messageOptions: MessageOptions(
           showOtherUsersAvatar: false,
           showOtherUsersName: false,
+          onResend: () => {print('d')},
+          resendIcon: Icon(Icons.lock_reset),
         ),
         onRefresh: (context) => {},
         inputOptions: InputOptions(
@@ -98,6 +100,7 @@ class _BasicState extends State<Basic> {
         ),
         currentUser: user,
         onSend: (ChatMessage m) {
+          m.status = MessageStatus.pending;
           setState(() {
             messages.insert(0, m);
           });

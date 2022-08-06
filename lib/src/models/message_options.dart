@@ -33,7 +33,13 @@ class MessageOptions {
     this.readStatusIcon,
     this.receivedStatusIcon,
     this.pendingStatusIcon,
+    this.resendIcon,
+    this.onResend,
   });
+
+  final Function(ChatMessage message)? onResend;
+
+  final Widget? resendIcon;
 
   final Widget? readStatusIcon;
 

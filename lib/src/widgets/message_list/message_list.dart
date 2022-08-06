@@ -114,19 +114,18 @@ class _MessageListState extends State<MessageList> {
                                 ),
                               ] else
                                 MessageRow(
+                                  resendIcon: widget.messageOptions.resendIcon,
+                                  onResend: widget.messageOptions.onResend,
                                   onTap: (message) => {
-                                    setState(() => {
-                                          if (!highlitedMessages
-                                              .contains(message))
-                                            {
-                                              highlitedMessages.clear(),
-                                              highlitedMessages.add(message),
-                                            }
-                                          else
-                                            {
-                                              highlitedMessages.clear(),
-                                            }
-                                        }),
+                                    setState(() {
+                                      if (!highlitedMessages
+                                          .contains(message)) {
+                                        highlitedMessages.clear();
+                                        highlitedMessages.add(message);
+                                      } else {
+                                        highlitedMessages.clear();
+                                      }
+                                    }),
                                   },
                                   color: highlitedMessages
                                           .contains(widget.messages[i])
