@@ -20,7 +20,7 @@ class MessageRow extends StatelessWidget {
 
   final Widget? resendIcon;
 
-  final GestureTapCallback? onResend;
+  final Function(ChatMessage)? onResend;
 
   final Function(ChatMessage) onTap;
   /// Current message to show
@@ -78,7 +78,7 @@ class MessageRow extends StatelessWidget {
         children: <Widget>[
           if (message.status == MessageStatus.pending && onResend != null && resendIcon != null)
             InkWell(
-              onTap: onResend!,
+              onTap: () => onResend!(message),
               child: resendIcon!,
             ),
           if (!messageOptions.showOtherUsersAvatar)

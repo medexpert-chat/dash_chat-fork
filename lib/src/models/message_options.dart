@@ -37,7 +37,7 @@ class MessageOptions {
     this.onResend,
   });
 
-  final GestureTapCallback? onResend;
+  final Function(ChatMessage message)? onResend;
 
   final Widget? resendIcon;
 
