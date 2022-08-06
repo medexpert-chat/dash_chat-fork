@@ -114,7 +114,7 @@ class _MessageListState extends State<MessageList> {
                                 ),
                               ] else
                                 MessageRow(
-                          resendIcon: widget.messageOptions.resendIcon,
+                                  resendIcon: widget.messageOptions.resendIcon,
                                   onResend: widget.messageOptions.onResend,
                                   onTap: (message) => {
                                     setState(() {
