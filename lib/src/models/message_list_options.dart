@@ -3,6 +3,7 @@ part of dash_chat_2;
 /// {@category Customization}
 class MessageListOptions {
   const MessageListOptions({
+    this.highlightedMessageId,
     this.backgroundColor = Colors.white,
     this.showDateSeparator = true,
     this.dateSeparatorFormat,
@@ -16,6 +17,8 @@ class MessageListOptions {
     this.typingBuilder,
     this.lastMessageBottomPadding = 5,
   });
+
+  final String? highlightedMessageId;
 
   /// Color of list of messages
   final Color backgroundColor;
