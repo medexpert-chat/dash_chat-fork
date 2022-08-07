@@ -85,9 +85,10 @@ class _InputToolbarState extends State<InputToolbar> {
             ),
             if (widget.inputOptions.trailing != null &&
                 widget.inputOptions.showTraillingBeforeSend &&
-                !widget.inputOptions.alwaysShowSend)
+                widget.inputOptions.alwaysShowSend)
               ...widget.inputOptions.trailing!,
-            if (widget.inputOptions.alwaysShowSend)
+            if (widget.inputOptions.alwaysShowSend ||
+                textController.text.isNotEmpty)
               widget.inputOptions.sendButtonBuilder != null
                   ? widget.inputOptions.sendButtonBuilder!(_sendMessage)
                   : defaultSendButton(color: Theme.of(context).primaryColor)(
