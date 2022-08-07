@@ -6,6 +6,7 @@ class MessageList extends StatefulWidget {
     required this.currentUser,
     required this.messages,
     required this.onRefresh,
+    this.highlightedMessageId,
     this.messageOptions = const MessageOptions(),
     this.messageListOptions = const MessageListOptions(),
     this.quickReplyOptions = const QuickReplyOptions(),
@@ -13,6 +14,8 @@ class MessageList extends StatefulWidget {
     this.typingUsers,
     Key? key,
   }) : super(key: key);
+
+  final int? highlightedMessageId;
 
   final Function onRefresh;
 
@@ -116,19 +119,8 @@ class _MessageListState extends State<MessageList> {
                                 MessageRow(
                                   resendIcon: widget.messageOptions.resendIcon,
                                   onResend: widget.messageOptions.onResend,
-                                  onTap: (message) => {
-                                    setState(() {
-                                      if (!highlitedMessages
-                                          .contains(message)) {
-                                        highlitedMessages.clear();
-                                        highlitedMessages.add(message);
-                                      } else {
-                                        highlitedMessages.clear();
-                                      }
-                                    }),
-                                  },
-                                  color: highlitedMessages
-                                          .contains(widget.messages[i])
+                                  color: widget.messages[i].id ==
+                                          highlitedMessageId
                                       ? Color.fromRGBO(21, 204, 171, 0.05)
                                       : Colors.transparent,
                                   message: widget.messages[i],
