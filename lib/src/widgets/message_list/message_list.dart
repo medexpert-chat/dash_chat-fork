@@ -116,7 +116,7 @@ class _MessageListState extends State<MessageList> {
                                 MessageRow(
                                   resendIcon: widget.messageOptions.resendIcon,
                                   onResend: widget.messageOptions.onResend,
-                                  color: widget.messages[i].id !=
+                                  color: widget.messages[i].id ==
                                           widget
                                               .messageListOptions.highlightedMessageId
                                       ? Color.fromRGBO(21, 204, 171, 0.05)
