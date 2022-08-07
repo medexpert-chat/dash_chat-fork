@@ -15,7 +15,7 @@ class MessageList extends StatefulWidget {
     Key? key,
   }) : super(key: key);
 
-  final int? highlightedMessageId;
+  final String? highlightedMessageId;
 
   final Function onRefresh;
 
