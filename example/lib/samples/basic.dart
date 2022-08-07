@@ -24,7 +24,7 @@ class _BasicState extends State<Basic> {
         messageOptions: MessageOptions(
           showOtherUsersAvatar: false,
           showOtherUsersName: false,
-          onResend: () => {print('d')},
+          onResend: (message) => {},
           resendIcon: Icon(Icons.lock_reset),
         ),
         onRefresh: (context) => {},
