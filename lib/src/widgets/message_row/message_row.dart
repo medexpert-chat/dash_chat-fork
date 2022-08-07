@@ -5,7 +5,6 @@ class MessageRow extends StatelessWidget {
   const MessageRow({
     required this.message,
     required this.currentUser,
-    required this.onTap,
     Color? color,
     this.onResend,
     this.resendIcon,
@@ -22,7 +21,6 @@ class MessageRow extends StatelessWidget {
 
   final Function(ChatMessage)? onResend;
 
-  final Function(ChatMessage) onTap;
   /// Current message to show
   final ChatMessage message;
 
