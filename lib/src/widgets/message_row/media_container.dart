@@ -43,6 +43,14 @@ class MediaContainer extends StatelessWidget {
       child: const CircularProgressIndicator(),
     );
     switch (media.type) {
+      case MediaType.audio:
+        return Stack(
+          alignment: AlignmentDirectional.bottomEnd,
+          children: <Widget>[
+            VoiceMessage(audioSrc: media.url,),
+            if (media.isUploading) loading
+          ],
+        );
       case MediaType.video:
         return Stack(
           alignment: AlignmentDirectional.bottomEnd,

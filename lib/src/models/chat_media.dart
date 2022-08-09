@@ -67,6 +67,8 @@ class MediaType {
 
   static MediaType parse(String value) {
     switch (value) {
+      case 'audio':
+        return MediaType.audio;
       case 'image':
         return MediaType.image;
       case 'video':
@@ -78,6 +80,7 @@ class MediaType {
     }
   }
 
+  static const audio = MediaType._internal('audio');
   static const image = MediaType._internal('image');
   static const video = MediaType._internal('video');
   static const file = MediaType._internal('file');
