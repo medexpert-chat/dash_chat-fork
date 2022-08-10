@@ -6,23 +6,12 @@ const Color primary = Color(0xff15CCAB);
 const Color palePrimary = Color.fromRGBO(21, 204, 171, 0.45);
 
 class VoiceMessage extends StatefulWidget {
-  VoiceMessage({
+  final String audioSrc;
+
+  const VoiceMessage({
     Key? key,
     required this.audioSrc,
-    this.noiseCount = 27,
-    this.contactBgColor = const Color(0xffffffff),
-    this.mePlayIconColor = Colors.black,
-    this.contactPlayIconColor = Colors.black26,
-    this.meFgColor = const Color(0xffffffff),
-    this.played = false,
-    this.onPlay,
   }) : super(key: key);
-
-  final String audioSrc;
-  final int noiseCount;
-  final Color meFgColor, contactBgColor, mePlayIconColor, contactPlayIconColor;
-  final bool played;
-  Function()? onPlay;
 
   @override
   _VoiceMessageState createState() => _VoiceMessageState();
@@ -35,6 +24,7 @@ class _VoiceMessageState extends State<VoiceMessage> {
 
   @override
   void initState() {
+    print(widget.audioSrc);
     player.setSource(UrlSource(widget.audioSrc));
     player.onPlayerComplete.listen((event) async {
       await player.stop();
@@ -133,7 +123,10 @@ class _VoiceMessageState extends State<VoiceMessage> {
                 stream: player.onPositionChanged,
                 initialData: const Duration(milliseconds: 0),
                 builder: (context, snap) {
-                  final value = (snap.data as Duration).inMilliseconds;
+                  var value = (snap.data as Duration).inMilliseconds;
+                  if (value > durationNotifier.value!.inMilliseconds) {
+                    value = durationNotifier.value!.inMilliseconds;
+                  }
 
                   return Opacity(
                     opacity: 0.0,
