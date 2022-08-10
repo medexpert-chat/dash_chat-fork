@@ -36,10 +36,10 @@ class VoiceMessage extends StatefulWidget {
 class _VoiceMessageState extends State<VoiceMessage>
     with SingleTickerProviderStateMixin {
   final AudioPlayer _player = AudioPlayer();
-  final double maxNoiseHeight = 6.w(), noiseWidth = 26.5.w();
+  final double noiseWidth = 26.5.w();
   Duration? _audioDuration;
   double maxDurationForSlider = .0000001;
-  bool _isPlaying = false, x2 = false, _audioConfigurationDone = false;
+  bool _isPlaying = false, _audioConfigurationDone = false;
   int _playingStatus = 0, duration = 00;
   String _remaingTime = '';
   AnimationController? _controller;
@@ -198,6 +198,7 @@ class _VoiceMessageState extends State<VoiceMessage>
   @override
   void dispose() {
     _player.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
