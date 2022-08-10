@@ -24,7 +24,6 @@ class _VoiceMessageState extends State<VoiceMessage> {
 
   @override
   void initState() {
-    print(widget.audioSrc);
     player.setSource(UrlSource(widget.audioSrc));
     player.onPlayerComplete.listen((event) async {
       await player.stop();

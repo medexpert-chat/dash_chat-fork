@@ -66,10 +66,16 @@ class MediaContainer extends StatelessWidget {
         return Stack(
           alignment: AlignmentDirectional.bottomEnd,
           children: <Widget>[
-            Image(
-              fit: BoxFit.fill,
-              alignment: isOwnMessage ? Alignment.topRight : Alignment.topLeft,
-              image: _getImage(media.url),
+            GestureDetector(
+              onTap: messageOptions.onTapMedia != null
+                  ? () => messageOptions.onTapMedia!(media)
+                  : null,
+              child: Image(
+                fit: BoxFit.fill,
+                alignment:
+                    isOwnMessage ? Alignment.topRight : Alignment.topLeft,
+                image: _getImage(media.url),
+              ),
             ),
             if (media.isUploading) loading
           ],
@@ -140,19 +146,14 @@ class MediaContainer extends StatelessWidget {
                 return Container(
                   color: Colors.transparent,
                   margin: const EdgeInsets.only(top: 5, right: 5),
-                  child: GestureDetector(
-                    onTap: messageOptions.onTapMedia != null
-                        ? () => messageOptions.onTapMedia!(m)
-                        : null,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: ColorFiltered(
-                        colorFilter: ColorFilter.mode(
-                          m.isUploading ? Colors.white54 : Colors.transparent,
-                          BlendMode.srcATop,
-                        ),
-                        child: _getMedia(m),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: ColorFiltered(
+                      colorFilter: ColorFilter.mode(
+                        m.isUploading ? Colors.white54 : Colors.transparent,
+                        BlendMode.srcATop,
                       ),
+                      child: _getMedia(m),
                     ),
                   ),
                 );
