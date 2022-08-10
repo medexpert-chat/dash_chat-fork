@@ -1,15 +1,10 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-
-// ignore: library_prefixes
-import 'package:just_audio/just_audio.dart' as jsAudio;
-import 'package:voice_message_package/src/duration.dart';
-import 'package:voice_message_package/src/helpers/utils.dart';
 import 'dart:math' as math;
 
-/// This is the main widget.
-///
-// ignore: must_be_immutable
+const Color primary = Color(0xff15CCAB);
+const Color palePrimary = Color.fromRGBO(21, 204, 171, 0.45);
+
 class VoiceMessage extends StatefulWidget {
   VoiceMessage({
     Key? key,
@@ -33,20 +28,21 @@ class VoiceMessage extends StatefulWidget {
   _VoiceMessageState createState() => _VoiceMessageState();
 }
 
-class _VoiceMessageState extends State<VoiceMessage>
-    with SingleTickerProviderStateMixin {
-  final AudioPlayer _player = AudioPlayer();
-  final double noiseWidth = 26.5.w();
-  Duration? _audioDuration;
-  double maxDurationForSlider = .0000001;
-  bool _isPlaying = false, _audioConfigurationDone = false;
-  int _playingStatus = 0, duration = 00;
-  String _remaingTime = '';
-  AnimationController? _controller;
+class _VoiceMessageState extends State<VoiceMessage> {
+  final AudioPlayer player = AudioPlayer();
+  final double noiseWidth = 136;
+  late final ValueNotifier<Duration?> durationNotifier;
 
   @override
   void initState() {
-    _setDuration();
+    player.setSource(UrlSource(widget.audioSrc));
+    player.onPlayerComplete.listen((event) async {
+      await player.stop();
+    });
+    durationNotifier = ValueNotifier(const Duration());
+    player.onDurationChanged.listen((event) async {
+      durationNotifier.value = await player.getDuration();
+    });
     super.initState();
   }
 
@@ -57,160 +53,115 @@ class _VoiceMessageState extends State<VoiceMessage>
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        InkWell(
-          onTap: () => !_audioConfigurationDone ? null : _changePlayingStatus(),
-          child: Container(
-            height: 32,
-            width: 32,
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: !_audioConfigurationDone
-                ? const CircularProgressIndicator(
-                    strokeWidth: 1,
-                  )
-                : Icon(
-                    _isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-                    size: 16,
-                    color: Color(0xFF15CCAB),
-                  ),
+        StreamBuilder<PlayerState>(
+          stream: player.onPlayerStateChanged,
+          initialData: PlayerState.stopped,
+          builder: (context, snap) {
+            final state = snap.data as PlayerState;
+            return Container(
+              height: 32,
+              width: 32,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (state == PlayerState.stopped ||
+                      state == PlayerState.paused)
+                    InkWell(
+                      onTap: () async => {
+                        await player.resume(),
+                      },
+                      child: const Icon(
+                        Icons.play_arrow_rounded,
+                        color: primary,
+                      ),
+                    ),
+                  if (state == PlayerState.playing)
+                    InkWell(
+                      onTap: () async => {
+                        await player.pause(),
+                      },
+                      child: const Icon(
+                        Icons.pause,
+                        color: primary,
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          height: 25,
+          width: noiseWidth,
+          child: Stack(
+            alignment: Alignment.centerLeft,
+            clipBehavior: Clip.hardEdge,
+            children: [
+              const CustomNoise(),
+              StreamBuilder<Duration>(
+                stream: player.onPositionChanged,
+                initialData: const Duration(seconds: 0),
+                builder: (context, snap) {
+                  final value = (snap.data as Duration).inMilliseconds;
+                  var step = 0.0;
+                  if (value != 0 &&
+                      durationNotifier.value!.inMilliseconds != value) {
+                    step = (noiseWidth /
+                        durationNotifier.value!.inMilliseconds *
+                        value);
+                  }
+                  return AnimatedPositioned(
+                    duration: const Duration(milliseconds: 200),
+                    left: step,
+                    child: Container(
+                      height: 6,
+                      width: 6,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3),
+                        color: Colors.black,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              StreamBuilder<Duration>(
+                stream: player.onPositionChanged,
+                initialData: const Duration(milliseconds: 0),
+                builder: (context, snap) {
+                  final value = (snap.data as Duration).inMilliseconds;
+
+                  return Opacity(
+                    opacity: 0.0,
+                    child: SizedBox(
+                      height: 25,
+                      width: noiseWidth,
+                      child: Slider(
+                        min: 0.0,
+                        max: durationNotifier.value!.inMilliseconds.toDouble(),
+                        onChanged: (value) => {
+                          player.seek(Duration(milliseconds: value.toInt())),
+                        },
+                        value: value.toDouble(),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
-        SizedBox(width: 8),
-        _noise(context),
       ],
     );
   }
 
-  /// Noise widget of audio.
-  _noise(BuildContext context) {
-    return SizedBox(
-      height: 25,
-      width: noiseWidth,
-      child: Stack(
-        alignment: Alignment.centerLeft,
-        clipBehavior: Clip.hardEdge,
-        children: [
-          const CustomNoise(),
-          if (_audioConfigurationDone)
-            AnimatedBuilder(
-              animation:
-                  CurvedAnimation(parent: _controller!, curve: Curves.ease),
-              builder: (context, child) {
-                return Positioned(
-                  left: _controller!.value,
-                  child: Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(3),
-                      color: Colors.black,
-                    ),
-                  ),
-                );
-              },
-            ),
-          Opacity(
-            opacity: 0.0,
-            child: Slider(
-              min: 0.0,
-              max: maxDurationForSlider,
-              onChanged: _onChangeSlider,
-              value: duration + .0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  _onChangeSlider(double d) async {
-    duration = d.round();
-    _controller?.value = (noiseWidth) * duration / maxDurationForSlider;
-    _remaingTime = VoiceDuration.getDuration(duration);
-    await _player.seek(Duration(seconds: duration));
-    _player.resume();
-    _controller?.forward();
-    setState(() {});
-  }
-
-  _setPlayingStatus() => _isPlaying = _playingStatus == 1;
-
-  _startPlaying() async {
-    _playingStatus = await _player.play(widget.audioSrc);
-    _setPlayingStatus();
-    _controller!.forward();
-  }
-
-  _stopPlaying() async {
-    _playingStatus = await _player.pause();
-    _controller!.stop();
-  }
-
-  void _setDuration() async {
-    _audioDuration = await jsAudio.AudioPlayer().setUrl(widget.audioSrc);
-    duration = _audioDuration!.inSeconds;
-    maxDurationForSlider = duration + .0;
-
-    _player.onPlayerStateChanged.listen((event) {
-      if (_player.state == PlayerState.COMPLETED) {
-        _isPlaying = false;
-        _controller!.value = 0;
-        setState(() {});
-      }
-    });
-
-    /// document will be added
-    _controller = AnimationController(
-      vsync: this,
-      lowerBound: 0,
-      upperBound: noiseWidth,
-      duration: _audioDuration,
-    );
-
-    /// document will be added
-    _controller!.addListener(() {
-      if (_controller!.isCompleted) {
-        _controller!.reset();
-        setState(() {});
-      }
-    });
-    _setAnimationCunfiguration(_audioDuration);
-  }
-
-  void _setAnimationCunfiguration(Duration? audioDuration) async {
-    _listenToRemaningTime();
-    _remaingTime = VoiceDuration.getDuration(duration);
-    _completeAnimationConfiguration();
-  }
-
-  void _completeAnimationConfiguration() =>
-      setState(() => _audioConfigurationDone = true);
-
-  void _changePlayingStatus() async {
-    if (widget.onPlay != null) widget.onPlay!();
-    _isPlaying ? _stopPlaying() : _startPlaying();
-    setState(() => _isPlaying = !_isPlaying);
-  }
-
   @override
   void dispose() {
-    _player.dispose();
-    _controller?.dispose();
     super.dispose();
-  }
-
-  void _listenToRemaningTime() {
-    _player.onAudioPositionChanged.listen((Duration p) {
-      final _newRemaingTime1 = p.toString().split('.')[0];
-      final _newRemaingTime2 =
-          _newRemaingTime1.substring(_newRemaingTime1.length - 5);
-      if (_newRemaingTime2 != _remaingTime) {
-        setState(() => _remaingTime = _newRemaingTime2);
-      }
-    });
   }
 }
 
@@ -227,12 +178,12 @@ class CustomNoise extends StatelessWidget {
   _singleNoise(BuildContext context) {
     final double height = (math.Random().nextDouble() + 0.1) * 24;
     return Container(
-      margin: const EdgeInsets.only(right: 2),
+      margin: const EdgeInsets.only(right: 4),
       width: 4,
       height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(2),
-        color: const Color.fromRGBO(21, 204, 171, 0.45),
+        color: palePrimary,
       ),
     );
   }
