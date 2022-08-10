@@ -18,8 +18,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Dash Chat Demo',
       supportedLocales: [Locale('ru')],
-      localizationsDelegates: [
+      localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
       ],
       theme: ThemeData(
         primarySwatch: Colors.teal,

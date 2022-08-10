@@ -62,6 +62,19 @@ List<ChatMessage> allUsersSample = <ChatMessage>[
 
 List<ChatMessage> basicSample = <ChatMessage>[
   ChatMessage(
+    text: '',
+    medias: [
+      ChatMedia(
+        url: 'http://staging.medexpert.chat/media/chats/25/audio/90b7384dd32f41aa88bbb4e185a2e723.mp4',
+        type: MediaType.audio,
+        fileName: 'image.png',
+      ),
+    ],
+    user: user2,
+    createdAt: DateTime(2021, 01, 30, 16, 45),
+    status: MessageStatus.read,
+  ),
+  ChatMessage(
     text: 'google.com',
     user: user2,
     createdAt: DateTime(2021, 01, 30, 16, 45),
@@ -83,13 +96,15 @@ List<ChatMessage> basicSample = <ChatMessage>[
 
 List<ChatMessage> headerMessage = <ChatMessage>[
   ChatMessage(
-    text: 'We recommend that you refrain from remote examination of the Client during the consultation on the Platform, establish diagnoses and prescribe treatment without physical examination or telemedicine services and tools.',
+    text:
+        'We recommend that you refrain from remote examination of the Client during the consultation on the Platform, establish diagnoses and prescribe treatment without physical examination or telemedicine services and tools.',
     user: user3,
     createdAt: DateTime(2021, 01, 30, 16, 34),
     messageType: ChatMessageType.info,
   ),
   ChatMessage(
-    text: 'As part of a paid request, the client can send you only one text message and attach up to two files. You can reply with an unlimited number of messages, attach images and files.',
+    text:
+        'As part of a paid request, the client can send you only one text message and attach up to two files. You can reply with an unlimited number of messages, attach images and files.',
     user: user3,
     createdAt: DateTime(2021, 01, 30, 16, 34),
     messageType: ChatMessageType.system,
