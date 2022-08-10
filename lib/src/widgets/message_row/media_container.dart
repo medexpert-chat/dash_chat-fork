@@ -47,7 +47,10 @@ class MediaContainer extends StatelessWidget {
         return Stack(
           alignment: AlignmentDirectional.bottomEnd,
           children: <Widget>[
-            VoiceMessage(audioSrc: media.url,),
+            VoiceMessage(
+              key: ValueKey(media.url),
+              audioSrc: media.url,
+            ),
             if (media.isUploading) loading
           ],
         );
