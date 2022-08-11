@@ -33,9 +33,14 @@ class _AudioMessageState extends State<AudioMessage> {
       player.setSource(DeviceFileSource(widget.localFile!));
     }
 
+    player.onPlayerStateChanged.listen((event) {
+      print(event);
+    });
     player.onPlayerComplete.listen((event) async {
       await player.stop();
     });
+
+    
     durationNotifier = ValueNotifier(const Duration());
     player.onDurationChanged.listen((event) async {
       durationNotifier.value = await player.getDuration();
@@ -104,26 +109,30 @@ class _AudioMessageState extends State<AudioMessage> {
                 StreamBuilder<Duration>(
                   stream: player.onPositionChanged,
                   initialData: const Duration(seconds: 0),
-                  builder: (context, snap) {
-                    final value = (snap.data as Duration).inMilliseconds;
-                    var step = 0.0;
-                    if (value != 0 &&
-                        durationNotifier.value!.inMilliseconds != value) {
-                      step = (constraints.maxWidth - width) /
-                          durationNotifier.value!.inMilliseconds *
-                          value;
-                    }
-                    return AnimatedPositioned(
-                      duration: const Duration(milliseconds: 200),
-                      left: step,
-                      child: Container(
-                        height: 6,
-                        width: 6,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(3),
-                          color: primary,
-                        ),
-                      ),
+                  builder: (context, position) {
+                    return StreamBuilder(
+                      stream: player.onPlayerStateChanged,
+                      builder: (context, state) {
+                        final value = (position.data as Duration).inMilliseconds;
+                        var step = 0.0;
+                        if (value != 0 && state.data != PlayerState.stopped) {
+                          step = (constraints.maxWidth - width) /
+                              durationNotifier.value!.inMilliseconds *
+                              value;
+                        }
+                        return AnimatedPositioned(
+                          duration: const Duration(milliseconds: 200),
+                          left: step,
+                          child: Container(
+                            height: 6,
+                            width: 6,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(3),
+                              color: primary,
+                            ),
+                          ),
+                        );
+                      }
                     );
                   },
                 ),
@@ -191,15 +200,18 @@ class Noise extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: List.generate(
-            100,
-                (index) => Container(
-              margin: const EdgeInsets.only(right: 2),
-              height: (Random().nextDouble() + 0.01) * 22,
-              width: 1.5,
-              color: gray,
+          children: [
+            const SizedBox(width: 2),
+            ...List.generate(
+              100,
+                  (index) => Container(
+                margin: const EdgeInsets.only(right: 2),
+                height: (Random().nextDouble() + 0.01) * 22,
+                width: 1.5,
+                color: gray,
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
