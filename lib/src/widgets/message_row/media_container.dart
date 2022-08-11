@@ -50,7 +50,6 @@ class MediaContainer extends StatelessWidget {
             AudioMessage(
               key: ValueKey(media.url),
               url: media.url,
-              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
             ),
             if (media.isUploading) loading
           ],
