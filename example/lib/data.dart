@@ -65,7 +65,7 @@ List<ChatMessage> basicSample = <ChatMessage>[
     text: '',
     medias: [
       ChatMedia(
-        url: 'http://staging.medexpert.chat/media/chats/25/audio/90b7384dd32f41aa88bbb4e185a2e723.mp4',
+        url: 'http://staging.medexpert.chat/media/chats/25/audio/e94eb24f9a5d46e993fedc44a1664801.mp4',
         type: MediaType.audio,
         fileName: 'image.png',
       ),

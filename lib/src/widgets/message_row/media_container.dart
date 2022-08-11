@@ -35,7 +35,7 @@ class MediaContainer extends StatelessWidget {
   final bool isNextSameAuthor;
 
   /// Get the right media widget according to its type
-  Widget _getMedia(ChatMedia media) {
+  Widget _getMedia(BuildContext context, ChatMedia media) {
     final Widget loading = Container(
       width: 15,
       height: 15,
@@ -47,9 +47,10 @@ class MediaContainer extends StatelessWidget {
         return Stack(
           alignment: AlignmentDirectional.bottomEnd,
           children: <Widget>[
-            VoiceMessage(
+            AudioMessage(
               key: ValueKey(media.url),
-              audioSrc: media.url,
+              url: media.url,
+              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
             ),
             if (media.isUploading) loading
           ],
@@ -153,7 +154,7 @@ class MediaContainer extends StatelessWidget {
                         m.isUploading ? Colors.white54 : Colors.transparent,
                         BlendMode.srcATop,
                       ),
-                      child: _getMedia(m),
+                      child: _getMedia(context, m),
                     ),
                   ),
                 );

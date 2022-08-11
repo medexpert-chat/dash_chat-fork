@@ -3,13 +3,12 @@ library dash_chat_2;
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_parsed_text/flutter_parsed_text.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart' as vp;
-import 'src/widgets/message_row/voice_message.dart';
+import 'src/widgets/message_row/audio_message.dart';
 
 part 'src/models/input_options.dart';
 part 'src/models/cursor_style.dart';
