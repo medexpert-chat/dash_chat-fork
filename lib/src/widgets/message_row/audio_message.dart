@@ -23,12 +23,10 @@ class AudioMessage extends StatefulWidget {
 class _AudioMessageState extends State<AudioMessage> {
   final player = AudioPlayer();
   late final ValueNotifier<Duration?> durationNotifier;
-  late final Widget noise;
 
   @override
   void initState() {
     super.initState();
-    noise = drawNoise();
     if (widget.url != null) {
       player.setSource(UrlSource(widget.url!));
     } else {
@@ -102,7 +100,7 @@ class _AudioMessageState extends State<AudioMessage> {
             Stack(
               alignment: Alignment.centerLeft,
               children: [
-                noise,
+                const Noise(),
                 StreamBuilder<Duration>(
                   stream: player.onPositionChanged,
                   initialData: const Duration(seconds: 0),
@@ -182,15 +180,20 @@ class _AudioMessageState extends State<AudioMessage> {
       );
     });
   }
+}
 
-  Widget drawNoise() {
+class Noise extends StatelessWidget {
+  const Noise({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Positioned.fill(
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: List.generate(
             100,
-            (index) => Container(
+                (index) => Container(
               margin: const EdgeInsets.only(right: 2),
               height: (Random().nextDouble() + 0.01) * 22,
               width: 1.5,
@@ -202,6 +205,7 @@ class _AudioMessageState extends State<AudioMessage> {
     );
   }
 }
+
 
 class CustomTrackShape extends RoundedRectSliderTrackShape {
   @override

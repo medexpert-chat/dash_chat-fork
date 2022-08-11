@@ -35,7 +35,7 @@ class MediaContainer extends StatelessWidget {
   final bool isNextSameAuthor;
 
   /// Get the right media widget according to its type
-  Widget _getMedia(BuildContext context, ChatMedia media) {
+  Widget _getMedia(ChatMedia media) {
     final Widget loading = Container(
       width: 15,
       height: 15,
@@ -153,7 +153,7 @@ class MediaContainer extends StatelessWidget {
                         m.isUploading ? Colors.white54 : Colors.transparent,
                         BlendMode.srcATop,
                       ),
-                      child: _getMedia(context, m),
+                      child: _getMedia(m),
                     ),
                   ),
                 );
