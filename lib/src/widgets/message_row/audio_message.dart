@@ -32,10 +32,6 @@ class _AudioMessageState extends State<AudioMessage> {
     } else {
       player.setSource(DeviceFileSource(widget.localFile!));
     }
-
-    player.onPlayerStateChanged.listen((event) {
-      print(event);
-    });
     player.onPlayerComplete.listen((event) async {
       await player.stop();
     });
