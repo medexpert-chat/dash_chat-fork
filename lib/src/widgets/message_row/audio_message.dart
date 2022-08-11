@@ -23,6 +23,7 @@ class AudioMessage extends StatefulWidget {
 class _AudioMessageState extends State<AudioMessage> {
   final player = AudioPlayer();
   late final ValueNotifier<Duration?> durationNotifier;
+  var lastTiming = 0;
 
   @override
   void initState() {
@@ -35,7 +36,6 @@ class _AudioMessageState extends State<AudioMessage> {
     player.onPlayerComplete.listen((event) async {
       await player.stop();
     });
-
     
     durationNotifier = ValueNotifier(const Duration());
     player.onDurationChanged.listen((event) async {
@@ -110,12 +110,18 @@ class _AudioMessageState extends State<AudioMessage> {
                       stream: player.onPlayerStateChanged,
                       builder: (context, state) {
                         final value = (position.data as Duration).inMilliseconds;
-                        var step = 0.0;
-                        if (value != 0 && state.data != PlayerState.stopped) {
-                          step = (constraints.maxWidth - width) /
-                              durationNotifier.value!.inMilliseconds *
-                              value;
+                        if (state.data == PlayerState.stopped) {
+                          lastTiming = value;
                         }
+                        var step = 0.0;
+                        if (lastTiming != value) {
+                          if (value != 0 && state.data != PlayerState.stopped) {
+                            step = (constraints.maxWidth - width) /
+                                durationNotifier.value!.inMilliseconds *
+                                value;
+                          }
+                        }
+
                         return AnimatedPositioned(
                           duration: const Duration(milliseconds: 200),
                           left: step,
