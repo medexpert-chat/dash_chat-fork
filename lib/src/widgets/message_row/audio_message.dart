@@ -1,7 +1,4 @@
-import 'dart:math';
-
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
+part of dash_chat_2;
 
 const Color primary = Color(0xff15CCAB);
 const Color gray = Color(0xA6000000);

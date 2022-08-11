@@ -2,13 +2,13 @@ library dash_chat_2;
 
 import 'dart:io';
 import 'dart:math';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_parsed_text/flutter_parsed_text.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart' as vp;
-import 'src/widgets/message_row/audio_message.dart';
 
 part 'src/models/input_options.dart';
 part 'src/models/cursor_style.dart';
@@ -33,6 +33,7 @@ part 'src/widgets/typing_users/default_typing_builder.dart';
 part 'src/widgets/quick_replies/quick_replies.dart';
 part 'src/widgets/quick_replies/default_quick_reply.dart';
 
+part 'src/widgets/message_row/audio_message.dart';
 part 'src/widgets/message_row/video_player.dart';
 part 'src/widgets/message_row/message_row.dart';
 part 'src/widgets/message_row/default_message_decoration.dart';
