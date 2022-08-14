@@ -62,10 +62,11 @@ List<ChatMessage> allUsersSample = <ChatMessage>[
 
 List<ChatMessage> basicSample = <ChatMessage>[
   ChatMessage(
+    id: '12',
     text: '',
     medias: [
       ChatMedia(
-        url: 'http://staging.medexpert.chat/media/chats/25/audio/90b7384dd32f41aa88bbb4e185a2e723.mp4',
+        url: 'http://staging.medexpert.chat/media/chats/25/audio/e94eb24f9a5d46e993fedc44a1664801.mp4',
         type: MediaType.audio,
         fileName: 'image.png',
       ),
@@ -75,18 +76,91 @@ List<ChatMessage> basicSample = <ChatMessage>[
     status: MessageStatus.read,
   ),
   ChatMessage(
+    id: '11',
     text: 'google.com',
     user: user2,
     createdAt: DateTime(2021, 01, 30, 16, 45),
     status: MessageStatus.read,
   ),
   ChatMessage(
+    id: '10',
     text: "Oh what's up guys?",
     user: user2,
     createdAt: DateTime(2021, 01, 30, 16, 45),
     status: MessageStatus.received,
   ),
   ChatMessage(
+    id: '9',
+    text: 'How you doin?',
+    user: user8,
+    createdAt: DateTime(2021, 01, 30, 16, 34),
+    status: MessageStatus.read,
+  ),
+  ChatMessage(
+    id: '8',
+    text: '',
+    medias: [
+      ChatMedia(
+        url: 'http://staging.medexpert.chat/media/chats/25/audio/e94eb24f9a5d46e993fedc44a1664801.mp4',
+        type: MediaType.audio,
+        fileName: 'image.png',
+      ),
+    ],
+    user: user2,
+    createdAt: DateTime(2021, 01, 30, 16, 45),
+    status: MessageStatus.read,
+  ),
+  ChatMessage(
+    id: '7',
+    text: 'google.com',
+    user: user2,
+    createdAt: DateTime(2021, 01, 30, 16, 45),
+    status: MessageStatus.read,
+  ),
+  ChatMessage(
+    id: '6',
+    text: "Oh what's up guys?",
+    user: user2,
+    createdAt: DateTime(2021, 01, 30, 16, 45),
+    status: MessageStatus.received,
+  ),
+  ChatMessage(
+    id: '5',
+    text: 'How you doin?',
+    user: user8,
+    createdAt: DateTime(2021, 01, 30, 16, 34),
+    status: MessageStatus.read,
+  ),
+  ChatMessage(
+    id: '1',
+    text: '',
+    medias: [
+      ChatMedia(
+        url: 'http://staging.medexpert.chat/media/chats/25/audio/e94eb24f9a5d46e993fedc44a1664801.mp4',
+        type: MediaType.audio,
+        fileName: 'image.png',
+      ),
+    ],
+    user: user2,
+    createdAt: DateTime(2021, 01, 30, 16, 45),
+    status: MessageStatus.read,
+  ),
+  ChatMessage(
+    id: '2',
+    text: 'google.com',
+    user: user2,
+    createdAt: DateTime(2021, 01, 30, 16, 45),
+    status: MessageStatus.read,
+  ),
+  ChatMessage(
+    id: '3',
+    text: "Oh what's up guys?",
+    user: user2,
+    createdAt: DateTime(2021, 01, 30, 16, 45),
+    status: MessageStatus.received,
+  ),
+  ChatMessage(
+    id: '4',
     text: 'How you doin?',
     user: user8,
     createdAt: DateTime(2021, 01, 30, 16, 34),

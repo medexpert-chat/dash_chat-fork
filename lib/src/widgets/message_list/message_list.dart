@@ -52,6 +52,7 @@ class _MessageListState extends State<MessageList> {
   void initState() {
     scrollController =
         widget.messageListOptions.scrollController ?? ScrollController();
+    VisibilityDetectorController.instance.notifyNow();
     super.initState();
   }
 
@@ -117,8 +118,8 @@ class _MessageListState extends State<MessageList> {
                                   resendIcon: widget.messageOptions.resendIcon,
                                   onResend: widget.messageOptions.onResend,
                                   color: widget.messages[i].id ==
-                                          widget
-                                              .messageListOptions.highlightedMessageId
+                                          widget.messageListOptions
+                                              .highlightedMessageId
                                       ? Color.fromRGBO(21, 204, 171, 0.05)
                                       : Colors.transparent,
                                   message: widget.messages[i],
