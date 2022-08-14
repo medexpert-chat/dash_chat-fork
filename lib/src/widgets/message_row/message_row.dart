@@ -13,7 +13,8 @@ class MessageRow extends StatelessWidget {
     this.messageOptions = const MessageOptions(),
     this.lastMessageBottomPadding = 5,
     Key? key,
-  }) : color = color ?? Colors.transparent, super(key: key);
+  })  : color = color ?? Colors.transparent,
+        super(key: key);
 
   final Color color;
 
@@ -70,11 +71,12 @@ class MessageRow extends StatelessWidget {
       color: color,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: isOwnMessage
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isOwnMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: <Widget>[
-          if (message.status == MessageStatus.pending && onResend != null && resendIcon != null)
+          if (message.status == MessageStatus.pending &&
+              onResend != null &&
+              resendIcon != null)
             InkWell(
               onTap: () => onResend!(message),
               child: resendIcon!,
@@ -99,73 +101,82 @@ class MessageRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   if (messageOptions.top != null)
-                    messageOptions.top!(
-                        message, previousMessage, nextMessage),
+                    messageOptions.top!(message, previousMessage, nextMessage),
                   if (!isOwnMessage &&
                       messageOptions.showOtherUsersName &&
                       !isPreviousSameAuthor)
                     messageOptions.userNameBuilder != null
                         ? messageOptions.userNameBuilder!(message.user)
                         : DefaultUserName(user: message.user),
-                  Container(
-                    decoration:
-                    messageOptions.messageDecorationBuilder != null
-                        ? messageOptions.messageDecorationBuilder!(
-                        message, previousMessage, nextMessage)
-                        : defaultMessageDecoration(
-                      color: isOwnMessage
-                          ? (messageOptions
-                          .currentUserContainerColor ??
-                          Theme.of(context).primaryColor)
-                          : (messageOptions.containerColor ??
-                          Colors.grey[100])!,
-                      borderTopLeft: 18.0,
-                      borderTopRight: 18.0,
-                      borderBottomLeft: 18.0,
-                      borderBottomRight: 18.0,
-                    ),
-                    padding: messageOptions.messagePadding ??
-                        const EdgeInsets.all(11),
-                    child: Column(
-                      crossAxisAlignment: isOwnMessage
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
-                      children: [
-                        if (message.medias != null &&
-                            message.medias!.isNotEmpty &&
-                            !messageOptions.textBeforeMedia)
-                          messageOptions.messageMediaBuilder != null
-                              ? messageOptions.messageMediaBuilder!(
+                  VisibilityDetector(
+                    key: Key(message.id.toString()),
+                    onVisibilityChanged: (info) => {
+                      if (messageOptions.onVisibilityChanges != null &&
+                          !isOwnMessage &&
+                          message.status != MessageStatus.read)
+                        {
+                          messageOptions.onVisibilityChanges!(message),
+                        }
+                    },
+                    child: Container(
+                      decoration: messageOptions.messageDecorationBuilder !=
+                              null
+                          ? messageOptions.messageDecorationBuilder!(
                               message, previousMessage, nextMessage)
-                              : MediaContainer(
-                            message: message,
-                            isOwnMessage: isOwnMessage,
-                            messageOptions: messageOptions,
-                          ),
-                        if (message.text.isNotEmpty)
-                          TextContainer(
-                            messageOptions: messageOptions,
-                            message: message,
-                            previousMessage: previousMessage,
-                            nextMessage: nextMessage,
-                            isOwnMessage: isOwnMessage,
-                            isNextSameAuthor: isNextSameAuthor,
-                            isPreviousSameAuthor: isPreviousSameAuthor,
-                            messageTextBuilder:
-                            messageOptions.messageTextBuilder,
-                          ),
-                        if (message.medias != null &&
-                            message.medias!.isNotEmpty &&
-                            messageOptions.textBeforeMedia)
-                          messageOptions.messageMediaBuilder != null
-                              ? messageOptions.messageMediaBuilder!(
-                              message, previousMessage, nextMessage)
-                              : MediaContainer(
-                            message: message,
-                            isOwnMessage: isOwnMessage,
-                            messageOptions: messageOptions,
-                          ),
-                      ],
+                          : defaultMessageDecoration(
+                              color: isOwnMessage
+                                  ? (messageOptions.currentUserContainerColor ??
+                                      Theme.of(context).primaryColor)
+                                  : (messageOptions.containerColor ??
+                                      Colors.grey[100])!,
+                              borderTopLeft: 18.0,
+                              borderTopRight: 18.0,
+                              borderBottomLeft: 18.0,
+                              borderBottomRight: 18.0,
+                            ),
+                      padding: messageOptions.messagePadding ??
+                          const EdgeInsets.all(11),
+                      child: Column(
+                        crossAxisAlignment: isOwnMessage
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          if (message.medias != null &&
+                              message.medias!.isNotEmpty &&
+                              !messageOptions.textBeforeMedia)
+                            messageOptions.messageMediaBuilder != null
+                                ? messageOptions.messageMediaBuilder!(
+                                    message, previousMessage, nextMessage)
+                                : MediaContainer(
+                                    message: message,
+                                    isOwnMessage: isOwnMessage,
+                                    messageOptions: messageOptions,
+                                  ),
+                          if (message.text.isNotEmpty)
+                            TextContainer(
+                              messageOptions: messageOptions,
+                              message: message,
+                              previousMessage: previousMessage,
+                              nextMessage: nextMessage,
+                              isOwnMessage: isOwnMessage,
+                              isNextSameAuthor: isNextSameAuthor,
+                              isPreviousSameAuthor: isPreviousSameAuthor,
+                              messageTextBuilder:
+                                  messageOptions.messageTextBuilder,
+                            ),
+                          if (message.medias != null &&
+                              message.medias!.isNotEmpty &&
+                              messageOptions.textBeforeMedia)
+                            messageOptions.messageMediaBuilder != null
+                                ? messageOptions.messageMediaBuilder!(
+                                    message, previousMessage, nextMessage)
+                                : MediaContainer(
+                                    message: message,
+                                    isOwnMessage: isOwnMessage,
+                                    messageOptions: messageOptions,
+                                  ),
+                        ],
+                      ),
                     ),
                   ),
                   if (messageOptions.bottom != null)

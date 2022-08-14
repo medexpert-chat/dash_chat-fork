@@ -35,7 +35,10 @@ class MessageOptions {
     this.pendingStatusIcon,
     this.resendIcon,
     this.onResend,
+    this.onVisibilityChanges,
   });
+
+  final Function(ChatMessage)? onVisibilityChanges;
 
   final Function(ChatMessage message)? onResend;
 
