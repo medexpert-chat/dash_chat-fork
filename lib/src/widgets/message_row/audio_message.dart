@@ -36,7 +36,7 @@ class _AudioMessageState extends State<AudioMessage> {
     player.onPlayerComplete.listen((event) async {
       await player.stop();
     });
-    
+
     durationNotifier = ValueNotifier(const Duration());
     player.onDurationChanged.listen((event) async {
       durationNotifier.value = await player.getDuration();
@@ -101,7 +101,7 @@ class _AudioMessageState extends State<AudioMessage> {
             Stack(
               alignment: Alignment.centerLeft,
               children: [
-                const Noise(),
+                Noise(timeLineWidth: constraints.maxWidth - width),
                 StreamBuilder<Duration>(
                   stream: player.onPositionChanged,
                   initialData: const Duration(seconds: 0),
@@ -109,7 +109,8 @@ class _AudioMessageState extends State<AudioMessage> {
                     return StreamBuilder(
                       stream: player.onPlayerStateChanged,
                       builder: (context, state) {
-                        final value = (position.data as Duration).inMilliseconds;
+                        final value =
+                            (position.data as Duration).inMilliseconds;
                         if (state.data == PlayerState.stopped) {
                           lastTiming = value;
                         }
@@ -134,7 +135,7 @@ class _AudioMessageState extends State<AudioMessage> {
                             ),
                           ),
                         );
-                      }
+                      },
                     );
                   },
                 ),
@@ -194,7 +195,12 @@ class _AudioMessageState extends State<AudioMessage> {
 }
 
 class Noise extends StatelessWidget {
-  const Noise({Key? key}) : super(key: key);
+  final double timeLineWidth;
+
+  const Noise({
+    Key? key,
+    required this.timeLineWidth,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -205,13 +211,8 @@ class Noise extends StatelessWidget {
           children: [
             const SizedBox(width: 2),
             ...List.generate(
-              100,
-                  (index) => Container(
-                margin: const EdgeInsets.only(right: 2),
-                height: (Random().nextDouble() + 0.01) * 22,
-                width: 1.5,
-                color: gray,
-              ),
+              (timeLineWidth / 3.5).ceil(),
+              (index) => const Stick(),
             ),
           ],
         ),
@@ -220,6 +221,19 @@ class Noise extends StatelessWidget {
   }
 }
 
+class Stick extends StatelessWidget {
+  const Stick({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 2),
+      height: (Random().nextDouble() + 0.01) * 22,
+      width: 1.5,
+      color: gray,
+    );
+  }
+}
 
 class CustomTrackShape extends RoundedRectSliderTrackShape {
   @override
