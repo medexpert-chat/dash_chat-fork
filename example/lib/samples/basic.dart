@@ -22,6 +22,7 @@ class _BasicState extends State<Basic> {
       ),
       body: DashChat(
         messageOptions: MessageOptions(
+          onVisibilityChanges: (message) => print(message.id),
           containerColor: Color.fromRGBO(21, 204, 171, 0.05),
           showOtherUsersAvatar: false,
           showOtherUsersName: false,
