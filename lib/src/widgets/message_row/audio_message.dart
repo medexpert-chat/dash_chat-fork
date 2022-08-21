@@ -182,9 +182,8 @@ class _AudioMessageState extends State<AudioMessage> {
                   milliseconds = 0;
                 }
 
-                final time = seconds < 10
-                    ? '0$seconds,$milliseconds'
-                    : '$seconds,$milliseconds';
+                final time =
+                    '${(seconds < 10) ? '0' : ''}$seconds,$milliseconds';
                 return Text(
                   time,
                   style: TextStyle(
