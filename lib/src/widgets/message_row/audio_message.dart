@@ -175,11 +175,12 @@ class _AudioMessageState extends State<AudioMessage> {
               valueListenable: durationNotifier,
               builder: (ctx, value, child) {
                 final allTime = (value as Duration).inMilliseconds;
-                final seconds = (allTime / 1000).floor();
-                final milliseconds = allTime % 1000 ~/ 100;
-                print(seconds);
-                print(milliseconds);
-                print(allTime);
+                var seconds = (allTime / 1000).floor();
+                var milliseconds = (allTime % 1000 / 100).ceil();
+                if (milliseconds == 10) {
+                  seconds += 1;
+                  milliseconds = 0;
+                }
 
                 final time = seconds < 10
                     ? '0$seconds,$milliseconds'
