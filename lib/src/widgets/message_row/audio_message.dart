@@ -177,6 +177,9 @@ class _AudioMessageState extends State<AudioMessage> {
                 final allTime = (value as Duration).inMilliseconds;
                 final seconds = (allTime / 1000).floor();
                 final milliseconds = allTime % 1000 ~/ 100;
+                print(seconds);
+                print(milliseconds);
+                print(allTime);
 
                 final time = seconds < 10
                     ? '0$seconds,$milliseconds'
