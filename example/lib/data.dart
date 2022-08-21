@@ -66,7 +66,7 @@ List<ChatMessage> basicSample = <ChatMessage>[
     text: '',
     medias: [
       ChatMedia(
-        url: 'http://staging.medexpert.chat/media/chats/25/audio/e94eb24f9a5d46e993fedc44a1664801.mp4',
+        url: 'http://staging.medexpert.chat/media/chats/3/audio/3f1b1a89aece4cd091f1e7c8590f037c.mp4',
         type: MediaType.audio,
         fileName: 'image.png',
       ),
@@ -101,7 +101,7 @@ List<ChatMessage> basicSample = <ChatMessage>[
     text: '',
     medias: [
       ChatMedia(
-        url: 'http://staging.medexpert.chat/media/chats/25/audio/e94eb24f9a5d46e993fedc44a1664801.mp4',
+        url: 'http://staging.medexpert.chat/media/chats/3/audio/56156993c7444c28a32b92cc0abb85f0.mp4',
         type: MediaType.audio,
         fileName: 'image.png',
       ),
@@ -136,7 +136,7 @@ List<ChatMessage> basicSample = <ChatMessage>[
     text: '',
     medias: [
       ChatMedia(
-        url: 'http://staging.medexpert.chat/media/chats/25/audio/e94eb24f9a5d46e993fedc44a1664801.mp4',
+        url: 'http://staging.medexpert.chat/media/chats/3/audio/e2146539b6274a938fb85c56a59290b5.mp4',
         type: MediaType.audio,
         fileName: 'image.png',
       ),
