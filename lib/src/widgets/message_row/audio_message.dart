@@ -22,24 +22,28 @@ class AudioMessage extends StatefulWidget {
 
 class _AudioMessageState extends State<AudioMessage> {
   final player = AudioPlayer();
-  late final ValueNotifier<Duration?> durationNotifier;
-  var lastTiming = 0;
+  final durationNotifier = ValueNotifier(0);
 
   @override
   void initState() {
     super.initState();
     if (widget.url != null) {
-      player.setSource(UrlSource(widget.url!));
+      player.setUrl(widget.url!);
     } else {
-      player.setSource(DeviceFileSource(widget.localFile!));
+      player.setFilePath(widget.localFile!);
     }
-    player.onPlayerComplete.listen((event) async {
-      await player.stop();
+
+    player.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        player.seek(const Duration(milliseconds: 0));
+        player.stop();
+      }
     });
 
-    durationNotifier = ValueNotifier(const Duration());
-    player.onDurationChanged.listen((event) async {
-      durationNotifier.value = await player.getDuration();
+    player.durationStream.listen((duration) {
+      if (duration != null) {
+        durationNotifier.value = duration.inMilliseconds;
+      }
     });
   }
 
@@ -67,35 +71,36 @@ class _AudioMessageState extends State<AudioMessage> {
           child: Row(
             children: [
               StreamBuilder<PlayerState>(
-                stream: player.onPlayerStateChanged,
-                initialData: PlayerState.stopped,
+                stream: player.playerStateStream,
                 builder: (context, snap) {
-                  final state = snap.data as PlayerState;
-                  return Row(
-                    children: [
-                      if (state == PlayerState.stopped ||
-                          state == PlayerState.paused)
-                        InkWell(
-                          onTap: () async => {
-                            await player.resume(),
-                          },
-                          child: const Icon(
-                            Icons.play_arrow_rounded,
-                            color: gray,
+                  if (snap.hasData) {
+                    final playingState = snap.data!.playing;
+                    return Row(
+                      children: [
+                        if (!playingState)
+                          InkWell(
+                            onTap: () async => {
+                              await player.play(),
+                            },
+                            child: const Icon(
+                              Icons.play_arrow_rounded,
+                              color: gray,
+                            ),
                           ),
-                        ),
-                      if (state == PlayerState.playing)
-                        InkWell(
-                          onTap: () async => {
-                            await player.pause(),
-                          },
-                          child: const Icon(
-                            Icons.pause,
-                            color: gray,
+                        if (playingState)
+                          InkWell(
+                            onTap: () async => {
+                              await player.pause(),
+                            },
+                            child: const Icon(
+                              Icons.pause,
+                              color: gray,
+                            ),
                           ),
-                        ),
-                    ],
-                  );
+                      ],
+                    );
+                  }
+                  return Container();
                 },
               ),
               const SizedBox(width: 10),
@@ -103,46 +108,34 @@ class _AudioMessageState extends State<AudioMessage> {
                 alignment: Alignment.centerLeft,
                 children: [
                   Noise(timeLineWidth: constraints.maxWidth - width),
-                  StreamBuilder<Duration>(
-                    stream: player.onPositionChanged,
-                    initialData: const Duration(seconds: 0),
+                  StreamBuilder(
+                    stream: player.positionStream,
+                    initialData: const Duration(milliseconds: 0),
                     builder: (context, position) {
-                      return StreamBuilder(
-                        stream: player.onPlayerStateChanged,
-                        builder: (context, state) {
-                          final value =
-                              (position.data as Duration).inMilliseconds;
-                          if (state.data == PlayerState.stopped) {
-                            lastTiming = value;
-                          }
-                          var step = 0.0;
-                          if (lastTiming != value) {
-                            if (value != 0 &&
-                                state.data != PlayerState.stopped) {
-                              step = (constraints.maxWidth - width) /
-                                  durationNotifier.value!.inMilliseconds *
-                                  value;
-                            }
-                          }
+                      final value = (position.data as Duration).inMilliseconds;
+                      double step = 0;
+                      if (value != 0 && value != durationNotifier.value) {
+                        step = (constraints.maxWidth - width) /
+                            durationNotifier.value *
+                            value;
+                      }
 
-                          return AnimatedPositioned(
-                            duration: const Duration(milliseconds: 200),
-                            left: step,
-                            child: Container(
-                              height: 6,
-                              width: 6,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(3),
-                                color: primary,
-                              ),
-                            ),
-                          );
-                        },
+                      return AnimatedPositioned(
+                        duration: const Duration(milliseconds: 200),
+                        left: step,
+                        child: Container(
+                          height: 6,
+                          width: 6,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3),
+                            color: primary,
+                          ),
+                        ),
                       );
                     },
                   ),
                   StreamBuilder<Duration>(
-                    stream: player.onPositionChanged,
+                    stream: player.positionStream,
                     initialData: const Duration(milliseconds: 0),
                     builder: (context, snap) {
                       final value = (snap.data as Duration).inMilliseconds;
@@ -157,8 +150,7 @@ class _AudioMessageState extends State<AudioMessage> {
                             ),
                             child: Slider(
                               min: 0.0,
-                              max: durationNotifier.value!.inMilliseconds
-                                  .toDouble(),
+                              max: durationNotifier.value.toDouble(),
                               onChanged: (value) => {
                                 player.seek(
                                     Duration(milliseconds: value.toInt())),
@@ -175,37 +167,22 @@ class _AudioMessageState extends State<AudioMessage> {
               const SizedBox(width: 10),
               ValueListenableBuilder(
                 valueListenable: durationNotifier,
-                builder: (context, value, child) {
+                builder: (context, int value, child) {
                   return StreamBuilder<Duration>(
-                    stream: player.onPositionChanged,
-                    initialData: value as Duration,
+                    stream: player.positionStream,
                     builder: (context, position) {
-                      return StreamBuilder<PlayerState>(
-                        stream: player.onPlayerStateChanged,
-                        initialData: player.state,
-                        builder: (context, state) {
-                          if (state.hasData) {
-                            final currTime =
-                                (position.data as Duration).inMilliseconds;
-
-                            final difference =
-                                (state.data == PlayerState.stopped)
-                                    ? value.inMilliseconds
-                                    : currTime;
-
-                            final time = getTime(difference);
-
-                            return Text(
-                              time,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.black.withOpacity(.9),
-                              ),
-                            );
-                          }
-                          return Container();
-                        },
-                      );
+                      if (position.hasData) {
+                        final currTime = position.data!.inMilliseconds;
+                        final time = (currTime == 0) ? value : currTime;
+                        return Text(
+                          getTime(time),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black.withOpacity(.9),
+                          ),
+                        );
+                      }
+                      return Container();
                     },
                   );
                 },
