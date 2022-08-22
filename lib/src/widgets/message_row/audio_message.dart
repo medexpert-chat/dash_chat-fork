@@ -22,24 +22,21 @@ class AudioMessage extends StatefulWidget {
 
 class _AudioMessageState extends State<AudioMessage> {
   final player = AudioPlayer();
-  late final ValueNotifier<Duration?> durationNotifier;
-  var lastTiming = 0;
 
   @override
   void initState() {
     super.initState();
     if (widget.url != null) {
-      player.setSource(UrlSource(widget.url!));
+      player.setUrl(widget.url!);
     } else {
-      player.setSource(DeviceFileSource(widget.localFile!));
+      player.setFilePath(widget.localFile!);
     }
-    player.onPlayerComplete.listen((event) async {
-      await player.stop();
-    });
 
-    durationNotifier = ValueNotifier(const Duration());
-    player.onDurationChanged.listen((event) async {
-      durationNotifier.value = await player.getDuration();
+    player.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        player.seek(const Duration(milliseconds: 0));
+        player.stop();
+      }
     });
   }
 
@@ -47,7 +44,6 @@ class _AudioMessageState extends State<AudioMessage> {
   void dispose() {
     super.dispose();
     player.dispose();
-    durationNotifier.dispose();
   }
 
   @override
@@ -64,168 +60,43 @@ class _AudioMessageState extends State<AudioMessage> {
             borderRadius: BorderRadius.circular(16),
             color: background,
           ),
-          child: Row(
-            children: [
-              StreamBuilder<PlayerState>(
-                stream: player.onPlayerStateChanged,
-                initialData: PlayerState.stopped,
-                builder: (context, snap) {
-                  final state = snap.data as PlayerState;
-                  return Row(
-                    children: [
-                      if (state == PlayerState.stopped ||
-                          state == PlayerState.paused)
-                        InkWell(
-                          onTap: () async => {
-                            await player.resume(),
-                          },
-                          child: const Icon(
-                            Icons.play_arrow_rounded,
-                            color: gray,
-                          ),
-                        ),
-                      if (state == PlayerState.playing)
-                        InkWell(
-                          onTap: () async => {
-                            await player.pause(),
-                          },
-                          child: const Icon(
-                            Icons.pause,
-                            color: gray,
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(width: 10),
-              Stack(
-                alignment: Alignment.centerLeft,
+          child: StreamBuilder<Duration?>(
+            stream: player.durationStream,
+            builder: (context, durationStream) {
+              final duration = durationStream.data?.inMilliseconds ?? 0;
+
+              return Row(
                 children: [
-                  Noise(timeLineWidth: constraints.maxWidth - width),
-                  StreamBuilder<Duration>(
-                    stream: player.onPositionChanged,
-                    initialData: const Duration(seconds: 0),
-                    builder: (context, position) {
-                      return StreamBuilder(
-                        stream: player.onPlayerStateChanged,
-                        builder: (context, state) {
-                          final value =
-                              (position.data as Duration).inMilliseconds;
-                          if (state.data == PlayerState.stopped) {
-                            lastTiming = value;
-                          }
-                          var step = 0.0;
-                          if (lastTiming != value) {
-                            if (value != 0 &&
-                                state.data != PlayerState.stopped) {
-                              step = (constraints.maxWidth - width) /
-                                  durationNotifier.value!.inMilliseconds *
-                                  value;
-                            }
-                          }
-
-                          return AnimatedPositioned(
-                            duration: const Duration(milliseconds: 200),
-                            left: step,
-                            child: Container(
-                              height: 6,
-                              width: 6,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(3),
-                                color: primary,
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
+                  PlayButton(player: player),
+                  const SizedBox(width: 10),
+                  Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      Noise(timeLineWidth: constraints.maxWidth - width),
+                      PlayerPosition(
+                        player: player,
+                        constraints: constraints,
+                        duration: duration,
+                      ),
+                      PlayerRewind(
+                        player: player,
+                        constraints: constraints,
+                        duration: duration,
+                      ),
+                    ],
                   ),
-                  StreamBuilder<Duration>(
-                    stream: player.onPositionChanged,
-                    initialData: const Duration(milliseconds: 0),
-                    builder: (context, snap) {
-                      final value = (snap.data as Duration).inMilliseconds;
-
-                      return Opacity(
-                        opacity: 0.0,
-                        child: SizedBox(
-                          width: constraints.maxWidth - width,
-                          child: SliderTheme(
-                            data: SliderThemeData(
-                              trackShape: CustomTrackShape(),
-                            ),
-                            child: Slider(
-                              min: 0.0,
-                              max: durationNotifier.value!.inMilliseconds
-                                  .toDouble(),
-                              onChanged: (value) => {
-                                player.seek(
-                                    Duration(milliseconds: value.toInt())),
-                              },
-                              value: value.toDouble(),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                  const SizedBox(width: 10),
+                  PlayerTime(
+                    player: player,
+                    duration: duration,
                   ),
                 ],
-              ),
-              const SizedBox(width: 10),
-              ValueListenableBuilder(
-                valueListenable: durationNotifier,
-                builder: (context, value, child) {
-                  return StreamBuilder<Duration>(
-                    stream: player.onPositionChanged,
-                    initialData: value as Duration,
-                    builder: (context, position) {
-                      return StreamBuilder<PlayerState>(
-                        stream: player.onPlayerStateChanged,
-                        initialData: player.state,
-                        builder: (context, state) {
-                          if (state.hasData) {
-                            final currTime =
-                                (position.data as Duration).inMilliseconds;
-
-                            final difference =
-                                (state.data == PlayerState.stopped)
-                                    ? value.inMilliseconds
-                                    : currTime;
-
-                            final time = getTime(difference);
-
-                            return Text(
-                              time,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.black.withOpacity(.9),
-                              ),
-                            );
-                          }
-                          return Container();
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
+              );
+            },
           ),
         );
       },
     );
-  }
-
-  String getTime(int time) {
-    var seconds = (time / 1000).floor();
-    var milliseconds = (time % 1000 / 100).ceil();
-    if (milliseconds == 10) {
-      seconds += 1;
-      milliseconds = 0;
-    }
-
-    return '${(seconds < 10) ? '0' : ''}$seconds,$milliseconds';
   }
 }
 
@@ -285,5 +156,180 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
         offset.dy + (parentBox.size.height - trackHeight) / 2;
     final double trackWidth = parentBox.size.width;
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
+  }
+}
+
+class PlayButton extends StatelessWidget {
+  final AudioPlayer player;
+
+  const PlayButton({
+    Key? key,
+    required this.player,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<PlayerState>(
+      stream: player.playerStateStream,
+      builder: (context, snap) {
+        if (snap.hasData) {
+          final playingState = snap.data!.playing;
+          return Row(
+            children: [
+              if (!playingState)
+                InkWell(
+                  onTap: () async => {
+                    await player.play(),
+                  },
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: gray,
+                  ),
+                ),
+              if (playingState)
+                InkWell(
+                  onTap: () async => {
+                    await player.pause(),
+                  },
+                  child: const Icon(
+                    Icons.pause,
+                    color: gray,
+                  ),
+                ),
+            ],
+          );
+        }
+        return Container();
+      },
+    );
+  }
+}
+
+class PlayerPosition extends StatelessWidget {
+  final AudioPlayer player;
+  final BoxConstraints constraints;
+  final int duration;
+
+  const PlayerPosition({
+    Key? key,
+    required this.player,
+    required this.constraints,
+    required this.duration,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: player.positionStream,
+      initialData: const Duration(milliseconds: 0),
+      builder: (context, position) {
+        final value = (position.data as Duration).inMilliseconds;
+        double step = 0;
+        if (value != 0 && value != duration) {
+          step = (constraints.maxWidth - width) / duration * value;
+        }
+
+        return AnimatedPositioned(
+          duration: const Duration(milliseconds: 200),
+          left: step,
+          child: Container(
+            height: 6,
+            width: 6,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(3),
+              color: primary,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class PlayerRewind extends StatelessWidget {
+  final AudioPlayer player;
+  final BoxConstraints constraints;
+  final int duration;
+
+  const PlayerRewind({
+    Key? key,
+    required this.player,
+    required this.constraints,
+    required this.duration,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Duration>(
+      stream: player.positionStream,
+      initialData: const Duration(milliseconds: 0),
+      builder: (context, snap) {
+        final value = (snap.data as Duration).inMilliseconds;
+
+        return Opacity(
+          opacity: 0.0,
+          child: SizedBox(
+            width: constraints.maxWidth - width,
+            child: SliderTheme(
+              data: SliderThemeData(
+                trackShape: CustomTrackShape(),
+              ),
+              child: Slider(
+                min: 0.0,
+                max: duration.toDouble(),
+                onChanged: (value) => {
+                  player.seek(
+                    Duration(
+                      milliseconds: value.toInt(),
+                    ),
+                  ),
+                },
+                value: value.toDouble(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class PlayerTime extends StatelessWidget {
+  final AudioPlayer player;
+  final int duration;
+
+  const PlayerTime({
+    Key? key,
+    required this.player,
+    required this.duration,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Duration>(
+      stream: player.positionStream,
+      builder: (context, position) {
+        final currTime = position.data!.inMilliseconds;
+        final time = (currTime == 0) ? duration : currTime;
+        return Text(
+          getTime(time),
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.black.withOpacity(.9),
+          ),
+        );
+      },
+    );
+  }
+
+  String getTime(int time) {
+    var seconds = (time / 1000).floor();
+    var milliseconds = (time % 1000 / 100).ceil();
+    if (milliseconds == 10) {
+      seconds += 1;
+      milliseconds = 0;
+    }
+
+    return '${(seconds < 10) ? '0' : ''}$seconds,$milliseconds';
   }
 }
