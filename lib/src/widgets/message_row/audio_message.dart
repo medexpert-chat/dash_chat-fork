@@ -52,151 +52,180 @@ class _AudioMessageState extends State<AudioMessage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      return Container(
-        height: 32,
-        padding: const EdgeInsets.symmetric(
-          vertical: 4,
-          horizontal: 10,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: background,
-        ),
-        child: Row(
-          children: [
-            StreamBuilder<PlayerState>(
-              stream: player.onPlayerStateChanged,
-              initialData: PlayerState.stopped,
-              builder: (context, snap) {
-                final state = snap.data as PlayerState;
-                return Row(
-                  children: [
-                    if (state == PlayerState.stopped ||
-                        state == PlayerState.paused)
-                      InkWell(
-                        onTap: () async => {
-                          await player.resume(),
-                        },
-                        child: const Icon(
-                          Icons.play_arrow_rounded,
-                          color: gray,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          height: 32,
+          padding: const EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 10,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: background,
+          ),
+          child: Row(
+            children: [
+              StreamBuilder<PlayerState>(
+                stream: player.onPlayerStateChanged,
+                initialData: PlayerState.stopped,
+                builder: (context, snap) {
+                  final state = snap.data as PlayerState;
+                  return Row(
+                    children: [
+                      if (state == PlayerState.stopped ||
+                          state == PlayerState.paused)
+                        InkWell(
+                          onTap: () async => {
+                            await player.resume(),
+                          },
+                          child: const Icon(
+                            Icons.play_arrow_rounded,
+                            color: gray,
+                          ),
                         ),
-                      ),
-                    if (state == PlayerState.playing)
-                      InkWell(
-                        onTap: () async => {
-                          await player.pause(),
-                        },
-                        child: const Icon(
-                          Icons.pause,
-                          color: gray,
+                      if (state == PlayerState.playing)
+                        InkWell(
+                          onTap: () async => {
+                            await player.pause(),
+                          },
+                          child: const Icon(
+                            Icons.pause,
+                            color: gray,
+                          ),
                         ),
-                      ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(width: 10),
-            Stack(
-              alignment: Alignment.centerLeft,
-              children: [
-                Noise(timeLineWidth: constraints.maxWidth - width),
-                StreamBuilder<Duration>(
-                  stream: player.onPositionChanged,
-                  initialData: const Duration(seconds: 0),
-                  builder: (context, position) {
-                    return StreamBuilder(
-                      stream: player.onPlayerStateChanged,
-                      builder: (context, state) {
-                        final value =
-                            (position.data as Duration).inMilliseconds;
-                        if (state.data == PlayerState.stopped) {
-                          lastTiming = value;
-                        }
-                        var step = 0.0;
-                        if (lastTiming != value) {
-                          if (value != 0 && state.data != PlayerState.stopped) {
-                            step = (constraints.maxWidth - width) /
-                                durationNotifier.value!.inMilliseconds *
-                                value;
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(width: 10),
+              Stack(
+                alignment: Alignment.centerLeft,
+                children: [
+                  Noise(timeLineWidth: constraints.maxWidth - width),
+                  StreamBuilder<Duration>(
+                    stream: player.onPositionChanged,
+                    initialData: const Duration(seconds: 0),
+                    builder: (context, position) {
+                      return StreamBuilder(
+                        stream: player.onPlayerStateChanged,
+                        builder: (context, state) {
+                          final value =
+                              (position.data as Duration).inMilliseconds;
+                          if (state.data == PlayerState.stopped) {
+                            lastTiming = value;
                           }
-                        }
+                          var step = 0.0;
+                          if (lastTiming != value) {
+                            if (value != 0 &&
+                                state.data != PlayerState.stopped) {
+                              step = (constraints.maxWidth - width) /
+                                  durationNotifier.value!.inMilliseconds *
+                                  value;
+                            }
+                          }
 
-                        return AnimatedPositioned(
-                          duration: const Duration(milliseconds: 200),
-                          left: step,
-                          child: Container(
-                            height: 6,
-                            width: 6,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(3),
-                              color: primary,
+                          return AnimatedPositioned(
+                            duration: const Duration(milliseconds: 200),
+                            left: step,
+                            child: Container(
+                              height: 6,
+                              width: 6,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(3),
+                                color: primary,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  StreamBuilder<Duration>(
+                    stream: player.onPositionChanged,
+                    initialData: const Duration(milliseconds: 0),
+                    builder: (context, snap) {
+                      final value = (snap.data as Duration).inMilliseconds;
+
+                      return Opacity(
+                        opacity: 0.0,
+                        child: SizedBox(
+                          width: constraints.maxWidth - width,
+                          child: SliderTheme(
+                            data: SliderThemeData(
+                              trackShape: CustomTrackShape(),
+                            ),
+                            child: Slider(
+                              min: 0.0,
+                              max: durationNotifier.value!.inMilliseconds
+                                  .toDouble(),
+                              onChanged: (value) => {
+                                player.seek(
+                                    Duration(milliseconds: value.toInt())),
+                              },
+                              value: value.toDouble(),
                             ),
                           ),
-                        );
-                      },
-                    );
-                  },
-                ),
-                StreamBuilder<Duration>(
-                  stream: player.onPositionChanged,
-                  initialData: const Duration(milliseconds: 0),
-                  builder: (context, snap) {
-                    final value = (snap.data as Duration).inMilliseconds;
-
-                    return Opacity(
-                      opacity: 0.0,
-                      child: SizedBox(
-                        width: constraints.maxWidth - width,
-                        child: SliderTheme(
-                          data: SliderThemeData(
-                            trackShape: CustomTrackShape(),
-                          ),
-                          child: Slider(
-                            min: 0.0,
-                            max: durationNotifier.value!.inMilliseconds
-                                .toDouble(),
-                            onChanged: (value) => {
-                              player
-                                  .seek(Duration(milliseconds: value.toInt())),
-                            },
-                            value: value.toDouble(),
-                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(width: 10),
-            ValueListenableBuilder(
-              valueListenable: durationNotifier,
-              builder: (ctx, value, child) {
-                final allTime = (value as Duration).inMilliseconds;
-                var seconds = (allTime / 1000).floor();
-                var milliseconds = (allTime % 1000 / 100).ceil();
-                if (milliseconds == 10) {
-                  seconds += 1;
-                  milliseconds = 0;
-                }
-
-                final time =
-                    '${(seconds < 10) ? '0' : ''}$seconds,$milliseconds';
-                return Text(
-                  time,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black.withOpacity(.9),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ],
-        ),
-      );
-    });
+                ],
+              ),
+              const SizedBox(width: 10),
+              ValueListenableBuilder(
+                valueListenable: durationNotifier,
+                builder: (context, value, child) {
+                  return StreamBuilder<Duration>(
+                    stream: player.onPositionChanged,
+                    initialData: value as Duration,
+                    builder: (context, position) {
+                      return StreamBuilder<PlayerState>(
+                        stream: player.onPlayerStateChanged,
+                        initialData: player.state,
+                        builder: (context, state) {
+                          if (state.hasData) {
+                            final currTime =
+                                (position.data as Duration).inMilliseconds;
+
+                            final difference =
+                                (state.data == PlayerState.stopped)
+                                    ? value.inMilliseconds
+                                    : currTime;
+
+                            final time = getTime(difference);
+
+                            return Text(
+                              time,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black.withOpacity(.9),
+                              ),
+                            );
+                          }
+                          return Container();
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String getTime(int time) {
+    var seconds = (time / 1000).floor();
+    var milliseconds = (time % 1000 / 100).ceil();
+    if (milliseconds == 10) {
+      seconds += 1;
+      milliseconds = 0;
+    }
+
+    return '${(seconds < 10) ? '0' : ''}$seconds,$milliseconds';
   }
 }
 
