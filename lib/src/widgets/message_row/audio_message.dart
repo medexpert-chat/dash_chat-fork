@@ -310,7 +310,7 @@ class PlayerTime extends StatelessWidget {
       stream: player.positionStream,
       initialData: const Duration(milliseconds: 0),
       builder: (context, position) {
-        final currTime = position.data!.inMilliseconds;
+        final currTime = position.data?.inMilliseconds ?? 0;
         final time = (currTime == 0) ? duration : currTime;
         return Text(
           getTime(time),
