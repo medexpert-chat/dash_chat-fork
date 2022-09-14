@@ -40,7 +40,7 @@ class MessageOptions {
 
   final Function(ChatMessage)? onVisibilityChanges;
 
-  final Function(ChatMessage message)? onResend;
+  final Future<void> Function(ChatMessage message)? onResend;
 
   final Widget? resendIcon;
 

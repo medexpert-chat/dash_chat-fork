@@ -26,7 +26,9 @@ class _BasicState extends State<Basic> {
           containerColor: Color.fromRGBO(21, 204, 171, 0.05),
           showOtherUsersAvatar: false,
           showOtherUsersName: false,
-          onResend: (message) => {},
+          onResend: (message) async {
+            await Future.delayed(const Duration(seconds: 1));
+          },
           resendIcon: Icon(Icons.lock_reset),
         ),
         onRefresh: (context) => {},
@@ -101,11 +103,14 @@ class _BasicState extends State<Basic> {
           ),
         ),
         currentUser: user,
-        onSend: (ChatMessage m) {
-          m.status = MessageStatus.pending;
-          setState(() {
-            messages.insert(0, m);
+        onSend: (ChatMessage m) async {
+          await Future.delayed(const Duration(seconds: 2), () {
+            m.status = MessageStatus.pending;
+            setState(() {
+              messages.insert(0, m);
+            });
           });
+
         },
         messages: messages,
       ),

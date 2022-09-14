@@ -18,7 +18,7 @@ class InputToolbar extends StatefulWidget {
   final InputOptions inputOptions;
 
   /// Function to call when the message is sent (click on the send button)
-  final Function(ChatMessage) onSend;
+  final Future<void> Function(ChatMessage) onSend;
 
   /// Current user using the chat
   final ChatUser currentUser;
@@ -29,12 +29,19 @@ class InputToolbar extends StatefulWidget {
 
 class _InputToolbarState extends State<InputToolbar> {
   late TextEditingController textController;
+  final ValueNotifier<bool> sendingNotifier = ValueNotifier(false);
 
   @override
   void initState() {
     textController =
         widget.inputOptions.textController ?? TextEditingController();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    sendingNotifier.dispose();
+    super.dispose();
   }
 
   @override
@@ -84,17 +91,31 @@ class _InputToolbarState extends State<InputToolbar> {
               ),
             ),
             if (widget.inputOptions.trailing != null &&
-                    widget.inputOptions.showTraillingBeforeSend &&
-                    !widget.inputOptions.alwaysShowSend &&
+                widget.inputOptions.showTraillingBeforeSend &&
+                !widget.inputOptions.alwaysShowSend &&
                 textController.text.isEmpty)
               ...widget.inputOptions.trailing!,
-            if (widget.inputOptions.alwaysShowSend ||
-                textController.text.isNotEmpty)
-              widget.inputOptions.sendButtonBuilder != null
-                  ? widget.inputOptions.sendButtonBuilder!(_sendMessage)
-                  : defaultSendButton(color: Theme.of(context).primaryColor)(
-                      _sendMessage,
+            ValueListenableBuilder<bool>(
+              valueListenable: sendingNotifier,
+              builder: (context, sending, _) {
+                if (widget.inputOptions.alwaysShowSend ||
+                    textController.text.isNotEmpty) {
+                  return AbsorbPointer(
+                    absorbing: sending,
+                    child: Opacity(
+                      opacity: sending ? 0.5 : 1,
+                      child: widget.inputOptions.sendButtonBuilder != null
+                          ? widget.inputOptions.sendButtonBuilder!(_sendMessage)
+                          : defaultSendButton(
+                          color: Theme.of(context).primaryColor)(
+                        _sendMessage,
+                      ),
                     ),
+                  );
+                }
+                return const SizedBox();
+              },
+            ),
             if (widget.inputOptions.trailing != null &&
                 !widget.inputOptions.showTraillingBeforeSend)
               ...widget.inputOptions.trailing!,
@@ -104,14 +125,16 @@ class _InputToolbarState extends State<InputToolbar> {
     );
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     if (textController.text.trim().isNotEmpty || widget.canSend) {
       final ChatMessage message = ChatMessage(
         text: textController.text,
         user: widget.currentUser,
         createdAt: DateTime.now(),
       );
-      widget.onSend(message);
+      sendingNotifier.value = true;
+      await widget.onSend(message);
+      sendingNotifier.value = false;
       if (widget.inputOptions.onTextChange != null) {
         widget.inputOptions.onTextChange!('');
       }

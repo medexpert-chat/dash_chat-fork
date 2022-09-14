@@ -21,7 +21,7 @@ class _QuickRepliesSampleState extends State<QuickRepliesSample> {
         onRefresh: (context) => {},
 
         currentUser: user,
-        onSend: (ChatMessage m) {
+        onSend: (ChatMessage m) async  {
           setState(() {
             messages.insert(0, m);
           });

@@ -1,7 +1,7 @@
 part of dash_chat_2;
 
 /// @nodoc
-class MessageRow extends StatelessWidget {
+class MessageRow extends StatefulWidget {
   const MessageRow({
     required this.message,
     required this.currentUser,
@@ -20,7 +20,7 @@ class MessageRow extends StatelessWidget {
 
   final Widget? resendIcon;
 
-  final Function(ChatMessage)? onResend;
+  final Future<void> Function(ChatMessage)? onResend;
 
   /// Current message to show
   final ChatMessage message;
@@ -39,56 +39,86 @@ class MessageRow extends StatelessWidget {
 
   final double lastMessageBottomPadding;
 
+  @override
+  State<MessageRow> createState() => _MessageRowState();
+}
+
+class _MessageRowState extends State<MessageRow> {
+  final ValueNotifier<bool> sendingNotifier = ValueNotifier(false);
+
+  @override
+  void dispose() {
+    sendingNotifier.dispose();
+    super.dispose();
+  }
+
   /// Get the avatar widget
   Widget getAvatar() {
-    return messageOptions.avatarBuilder != null
-        ? messageOptions.avatarBuilder!(
-            message.user,
-            messageOptions.onPressAvatar,
-            messageOptions.onLongPressAvatar,
+    return widget.messageOptions.avatarBuilder != null
+        ? widget.messageOptions.avatarBuilder!(
+            widget.message.user,
+            widget.messageOptions.onPressAvatar,
+            widget.messageOptions.onLongPressAvatar,
           )
         : DefaultAvatar(
-            user: message.user,
-            onLongPressAvatar: messageOptions.onLongPressAvatar,
-            onPressAvatar: messageOptions.onPressAvatar,
+            user: widget.message.user,
+            onLongPressAvatar: widget.messageOptions.onLongPressAvatar,
+            onPressAvatar: widget.messageOptions.onPressAvatar,
           );
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isOwnMessage = message.user.id == currentUser.id;
+    final bool isOwnMessage = widget.message.user.id == widget.currentUser.id;
     bool isPreviousSameAuthor = false;
     bool isNextSameAuthor = false;
-    if (previousMessage != null &&
-        previousMessage!.user.id == message.user.id) {
+    if (widget.previousMessage != null &&
+        widget.previousMessage!.user.id == widget.message.user.id) {
       isPreviousSameAuthor = true;
     }
-    if (nextMessage != null && nextMessage!.user.id == message.user.id) {
+    if (widget.nextMessage != null &&
+        widget.nextMessage!.user.id == widget.message.user.id) {
       isNextSameAuthor = true;
     }
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      color: color,
+      color: widget.color,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment:
             isOwnMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: <Widget>[
-          if (message.status == MessageStatus.pending &&
-              onResend != null &&
-              resendIcon != null)
-            InkWell(
-              onTap: () => onResend!(message),
-              child: resendIcon!,
+          if (widget.message.status == MessageStatus.pending &&
+              widget.onResend != null &&
+              widget.resendIcon != null)
+            ValueListenableBuilder<bool>(
+              valueListenable: sendingNotifier,
+              builder: (context, sending, _) {
+                return AbsorbPointer(
+                  absorbing: sending,
+                  child: Opacity(
+                    opacity: sending ? 0.5 : 1,
+                    child: InkWell(
+                      onTap: () async {
+                        sendingNotifier.value = true;
+                        await widget.onResend!(widget.message);
+                        sendingNotifier.value = false;
+                      },
+                      child: widget.resendIcon!,
+                    ),
+                  ),
+                );
+              },
             ),
-          if (!messageOptions.showOtherUsersAvatar)
+          if (!widget.messageOptions.showOtherUsersAvatar)
             const Padding(padding: EdgeInsets.only(left: 10)),
           GestureDetector(
-            onLongPress: messageOptions.onLongPressMessage != null
-                ? () => messageOptions.onLongPressMessage!(message)
+            onLongPress: widget.messageOptions.onLongPressMessage != null
+                ? () =>
+                    widget.messageOptions.onLongPressMessage!(widget.message)
                 : null,
-            onTap: messageOptions.onPressMessage != null
-                ? () => messageOptions.onPressMessage!(message)
+            onTap: widget.messageOptions.onPressMessage != null
+                ? () => widget.messageOptions.onPressMessage!(widget.message)
                 : null,
             child: ConstrainedBox(
               constraints: BoxConstraints(
@@ -100,98 +130,108 @@ class MessageRow extends StatelessWidget {
                     : CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  if (messageOptions.top != null)
-                    messageOptions.top!(message, previousMessage, nextMessage),
+                  if (widget.messageOptions.top != null)
+                    widget.messageOptions.top!(widget.message,
+                        widget.previousMessage, widget.nextMessage),
                   if (!isOwnMessage &&
-                      messageOptions.showOtherUsersName &&
+                      widget.messageOptions.showOtherUsersName &&
                       !isPreviousSameAuthor)
-                    messageOptions.userNameBuilder != null
-                        ? messageOptions.userNameBuilder!(message.user)
-                        : DefaultUserName(user: message.user),
+                    widget.messageOptions.userNameBuilder != null
+                        ? widget.messageOptions
+                            .userNameBuilder!(widget.message.user)
+                        : DefaultUserName(user: widget.message.user),
                   VisibilityDetector(
-                    key: Key(message.id.toString()),
+                    key: Key(widget.message.id.toString()),
                     onVisibilityChanged: (info) => {
-                      if (messageOptions.onVisibilityChanges != null &&
+                      if (widget.messageOptions.onVisibilityChanges != null &&
                           !isOwnMessage &&
-                          message.status != MessageStatus.read)
+                          widget.message.status != MessageStatus.read)
                         {
-                          messageOptions.onVisibilityChanges!(message),
+                          widget.messageOptions
+                              .onVisibilityChanges!(widget.message),
                         }
                     },
                     child: Container(
-                      decoration: messageOptions.messageDecorationBuilder !=
-                              null
-                          ? messageOptions.messageDecorationBuilder!(
-                              message, previousMessage, nextMessage)
-                          : defaultMessageDecoration(
-                              color: isOwnMessage
-                                  ? (messageOptions.currentUserContainerColor ??
-                                      Theme.of(context).primaryColor)
-                                  : (messageOptions.containerColor ??
-                                      Colors.grey[100])!,
-                              borderTopLeft: 18.0,
-                              borderTopRight: 18.0,
-                              borderBottomLeft: 18.0,
-                              borderBottomRight: 18.0,
-                            ),
-                      padding: messageOptions.messagePadding ??
+                      decoration:
+                          widget.messageOptions.messageDecorationBuilder != null
+                              ? widget.messageOptions.messageDecorationBuilder!(
+                                  widget.message,
+                                  widget.previousMessage,
+                                  widget.nextMessage)
+                              : defaultMessageDecoration(
+                                  color: isOwnMessage
+                                      ? (widget.messageOptions
+                                              .currentUserContainerColor ??
+                                          Theme.of(context).primaryColor)
+                                      : (widget.messageOptions.containerColor ??
+                                          Colors.grey[100])!,
+                                  borderTopLeft: 18.0,
+                                  borderTopRight: 18.0,
+                                  borderBottomLeft: 18.0,
+                                  borderBottomRight: 18.0,
+                                ),
+                      padding: widget.messageOptions.messagePadding ??
                           const EdgeInsets.all(11),
                       child: Column(
                         crossAxisAlignment: isOwnMessage
                             ? CrossAxisAlignment.end
                             : CrossAxisAlignment.start,
                         children: [
-                          if (message.medias != null &&
-                              message.medias!.isNotEmpty &&
-                              !messageOptions.textBeforeMedia)
-                            messageOptions.messageMediaBuilder != null
-                                ? messageOptions.messageMediaBuilder!(
-                                    message, previousMessage, nextMessage)
+                          if (widget.message.medias != null &&
+                              widget.message.medias!.isNotEmpty &&
+                              !widget.messageOptions.textBeforeMedia)
+                            widget.messageOptions.messageMediaBuilder != null
+                                ? widget.messageOptions.messageMediaBuilder!(
+                                    widget.message,
+                                    widget.previousMessage,
+                                    widget.nextMessage)
                                 : MediaContainer(
-                                    message: message,
+                                    message: widget.message,
                                     isOwnMessage: isOwnMessage,
-                                    messageOptions: messageOptions,
+                                    messageOptions: widget.messageOptions,
                                   ),
-                          if (message.text.isNotEmpty)
+                          if (widget.message.text.isNotEmpty)
                             TextContainer(
-                              messageOptions: messageOptions,
-                              message: message,
-                              previousMessage: previousMessage,
-                              nextMessage: nextMessage,
+                              messageOptions: widget.messageOptions,
+                              message: widget.message,
+                              previousMessage: widget.previousMessage,
+                              nextMessage: widget.nextMessage,
                               isOwnMessage: isOwnMessage,
                               isNextSameAuthor: isNextSameAuthor,
                               isPreviousSameAuthor: isPreviousSameAuthor,
                               messageTextBuilder:
-                                  messageOptions.messageTextBuilder,
+                                  widget.messageOptions.messageTextBuilder,
                             ),
-                          if (message.medias != null &&
-                              message.medias!.isNotEmpty &&
-                              messageOptions.textBeforeMedia)
-                            messageOptions.messageMediaBuilder != null
-                                ? messageOptions.messageMediaBuilder!(
-                                    message, previousMessage, nextMessage)
+                          if (widget.message.medias != null &&
+                              widget.message.medias!.isNotEmpty &&
+                              widget.messageOptions.textBeforeMedia)
+                            widget.messageOptions.messageMediaBuilder != null
+                                ? widget.messageOptions.messageMediaBuilder!(
+                                    widget.message,
+                                    widget.previousMessage,
+                                    widget.nextMessage)
                                 : MediaContainer(
-                                    message: message,
+                                    message: widget.message,
                                     isOwnMessage: isOwnMessage,
-                                    messageOptions: messageOptions,
+                                    messageOptions: widget.messageOptions,
                                   ),
                         ],
                       ),
                     ),
                   ),
-                  if (messageOptions.bottom != null)
-                    messageOptions.bottom!(
-                        message, previousMessage, nextMessage),
+                  if (widget.messageOptions.bottom != null)
+                    widget.messageOptions.bottom!(widget.message,
+                        widget.previousMessage, widget.nextMessage),
                 ],
               ),
             ),
           ),
-          if (messageOptions.showCurrentUserAvatar)
+          if (widget.messageOptions.showCurrentUserAvatar)
             Opacity(
               opacity: isOwnMessage && !isNextSameAuthor ? 1 : 0,
               child: getAvatar(),
             ),
-          if (!messageOptions.showCurrentUserAvatar)
+          if (!widget.messageOptions.showCurrentUserAvatar)
             const Padding(padding: EdgeInsets.only(left: 10))
         ],
       ),
