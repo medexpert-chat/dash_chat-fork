@@ -93,11 +93,11 @@ class _MessageRowState extends State<MessageRow> {
               widget.resendIcon != null)
             ValueListenableBuilder<bool>(
               valueListenable: sendingNotifier,
-              builder: (context, value, _) {
+              builder: (context, sending, _) {
                 return AbsorbPointer(
-                  absorbing: value,
+                  absorbing: sending,
                   child: Opacity(
-                    opacity: value ? 0.5 : 1,
+                    opacity: sending ? 0.5 : 1,
                     child: InkWell(
                       onTap: () async {
                         sendingNotifier.value = true;

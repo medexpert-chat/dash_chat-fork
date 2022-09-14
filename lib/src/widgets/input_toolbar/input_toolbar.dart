@@ -97,13 +97,13 @@ class _InputToolbarState extends State<InputToolbar> {
               ...widget.inputOptions.trailing!,
             ValueListenableBuilder<bool>(
               valueListenable: sendingNotifier,
-              builder: (context, value, _) {
+              builder: (context, sending, _) {
                 if (widget.inputOptions.alwaysShowSend ||
                     textController.text.isNotEmpty) {
                   return AbsorbPointer(
-                    absorbing: value,
+                    absorbing: sending,
                     child: Opacity(
-                      opacity: value ? 0.5 : 1,
+                      opacity: sending ? 0.5 : 1,
                       child: widget.inputOptions.sendButtonBuilder != null
                           ? widget.inputOptions.sendButtonBuilder!(_sendMessage)
                           : defaultSendButton(
