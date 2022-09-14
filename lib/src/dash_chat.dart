@@ -26,7 +26,7 @@ class DashChat extends StatelessWidget {
   final ChatUser currentUser;
 
   /// Function to call when the user sends a message
-  final void Function(ChatMessage message) onSend;
+  final Future<void> Function(ChatMessage message) onSend;
 
   /// List of messages visible in the chat
   final List<ChatMessage> messages;

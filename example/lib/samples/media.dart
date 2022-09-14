@@ -22,7 +22,7 @@ class _MediaState extends State<Media> {
       body: DashChat(
         onRefresh: (context) => refresh(context),
         currentUser: user,
-        onSend: (ChatMessage m) {
+        onSend: (ChatMessage m) async  {
           setState(() {
             messages.insert(0, m);
           });

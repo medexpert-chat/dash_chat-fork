@@ -21,7 +21,7 @@ class _AvatarSampleState extends State<AvatarSample> {
         onRefresh: (context) => {},
 
         currentUser: user,
-        onSend: (ChatMessage m) {
+        onSend: (ChatMessage m) async {
           setState(() {
             messages.insert(0, m);
           });

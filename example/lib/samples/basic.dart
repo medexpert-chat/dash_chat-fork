@@ -101,11 +101,14 @@ class _BasicState extends State<Basic> {
           ),
         ),
         currentUser: user,
-        onSend: (ChatMessage m) {
-          m.status = MessageStatus.pending;
-          setState(() {
-            messages.insert(0, m);
+        onSend: (ChatMessage m) async {
+          await Future.delayed(const Duration(seconds: 2), () {
+            m.status = MessageStatus.pending;
+            setState(() {
+              messages.insert(0, m);
+            });
           });
+
         },
         messages: messages,
       ),
