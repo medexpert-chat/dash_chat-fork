@@ -14,7 +14,7 @@ dependencies:
   intl: ^0.17.0
   url_launcher: ^6.0.10
   video_player: ^2.2.5
-  pull_to_refresh: ^2.0.0
+  pull_to_refresh_flutter3: 2.0.1
   just_audio: 0.9.28
   visibility_detector: 0.3.3
 
