@@ -71,6 +71,30 @@ class MediaContainer extends StatelessWidget {
                   ? () => messageOptions.onTapMedia!(media)
                   : null,
               child: Image(
+                loadingBuilder: (context, child, event) {
+                  if (event != null && event.expectedTotalBytes != null) {
+                    final progress = event.cumulativeBytesLoaded.toDouble() /
+                        event.expectedTotalBytes!;
+
+                    return Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: SizedBox(
+                        height: 32,
+                        width: 32,
+                        child: CircularProgressIndicator(
+                          value: progress,
+                          strokeWidth: 3,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Color(0xff15ccab),
+                          ),
+                          backgroundColor: const Color(0xfff2f2f2),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return child;
+                },
                 fit: BoxFit.fill,
                 alignment:
                     isOwnMessage ? Alignment.topRight : Alignment.topLeft,
