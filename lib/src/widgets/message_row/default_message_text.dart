@@ -24,11 +24,8 @@ class DefaultMessageText extends StatelessWidget {
       crossAxisAlignment:
           isOwnMessage ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: <Widget>[
-        ParsedText(
-          parse: messageOptions.parsePatterns != null
-              ? messageOptions.parsePatterns!
-              : defaultPersePatterns,
-          text: message.text,
+        SelectableText(
+          message.text,
           style: TextStyle(
             color: isOwnMessage
                 ? (messageOptions.currentUserTextColor ?? Colors.white)
