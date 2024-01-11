@@ -24,43 +24,50 @@ class DefaultMessageText extends StatelessWidget {
       crossAxisAlignment:
           isOwnMessage ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: <Widget>[
-        SelectableText(
-          message.text,
-          style: TextStyle(
-            color: isOwnMessage
-                ? (messageOptions.currentUserTextColor ?? Colors.white)
-                : (messageOptions.textColor ?? Colors.black),
+        SelectableRegion(
+          focusNode: FocusNode(),
+          selectionControls: materialTextSelectionControls,
+          child: Text(
+            message.text,
+            style: TextStyle(
+              color: isOwnMessage
+                  ? (messageOptions.currentUserTextColor ?? Colors.white)
+                  : (messageOptions.textColor ?? Colors.black),
+            ),
           ),
         ),
         const SizedBox(height: 3),
-        if (!messageOptions.textBeforeMedia || message.medias == null || message.medias!.isEmpty)
+        if (!messageOptions.textBeforeMedia ||
+            message.medias == null ||
+            message.medias!.isEmpty)
           Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (messageOptions.showTime)
-              messageOptions.messageTimeBuilder != null
-                  ? messageOptions.messageTimeBuilder!(message, isOwnMessage)
-                  : Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        (messageOptions.timeFormat ?? intl.DateFormat('HH:mm'))
-                            .format(message.createdAt),
-                        style: TextStyle(
-                          color: isOwnMessage
-                              ? (messageOptions.currentUserTextColor ??
-                                  Colors.white70)
-                              : (messageOptions.textColor ?? Colors.black54),
-                          fontSize: 10,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (messageOptions.showTime)
+                messageOptions.messageTimeBuilder != null
+                    ? messageOptions.messageTimeBuilder!(message, isOwnMessage)
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          (messageOptions.timeFormat ??
+                                  intl.DateFormat('HH:mm'))
+                              .format(message.createdAt),
+                          style: TextStyle(
+                            color: isOwnMessage
+                                ? (messageOptions.currentUserTextColor ??
+                                    Colors.white70)
+                                : (messageOptions.textColor ?? Colors.black54),
+                            fontSize: 10,
+                          ),
                         ),
                       ),
-                    ),
-            if (isOwnMessage && messageOptions.showReadStatus)
-              Padding(
-                padding: const EdgeInsets.only(left: 6),
-                child: _getIconByStatus(message),
-              ),
-          ],
-        ),
+              if (isOwnMessage && messageOptions.showReadStatus)
+                Padding(
+                  padding: const EdgeInsets.only(left: 6),
+                  child: _getIconByStatus(message),
+                ),
+            ],
+          ),
       ],
     );
   }

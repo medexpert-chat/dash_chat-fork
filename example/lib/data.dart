@@ -84,7 +84,7 @@ List<ChatMessage> basicSample = <ChatMessage>[
   ),
   ChatMessage(
     id: '10',
-    text: "Oh what's up guys?",
+    text: "Oh what's up guys? Oh what's up guys? Oh what's up guys? Oh what's up guys? Oh what's up guys? Oh what's up guys? Oh what's up guys? Oh what's up guys? Oh what's up guys? Oh what's up guys? Oh what's up guys? Oh what's up guys? ",
     user: user2,
     createdAt: DateTime(2021, 01, 30, 16, 45),
     status: MessageStatus.received,
