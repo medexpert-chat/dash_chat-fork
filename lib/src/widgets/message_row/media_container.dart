@@ -105,41 +105,44 @@ class MediaContainer extends StatelessWidget {
           ],
         );
       default:
-        return TextContainer(
-          isOwnMessage: isOwnMessage,
-          messageOptions: messageOptions,
-          message: message,
-          messageTextBuilder: (ChatMessage m, ChatMessage? p, ChatMessage? n) {
-            return Row(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: !media.isUploading
-                      ? Icon(
-                          Icons.description,
-                          size: 18,
-                          color: isOwnMessage
-                              ? (messageOptions.currentUserTextColor ??
-                                  Colors.white)
-                              : (messageOptions.textColor ?? Colors.black),
-                        )
-                      : loading,
-                ),
-                Flexible(
-                  child: Text(
-                    media.fileName,
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: isOwnMessage
-                          ? (messageOptions.currentUserTextColor ??
-                              Colors.white)
-                          : (messageOptions.textColor ?? Colors.black),
+        return InkWell(
+          onTap: () => launchUrl(Uri.parse(media.fileName)),
+          child: TextContainer(
+            isOwnMessage: isOwnMessage,
+            messageOptions: messageOptions,
+            message: message,
+            messageTextBuilder: (ChatMessage m, ChatMessage? p, ChatMessage? n) {
+              return Row(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: !media.isUploading
+                        ? Icon(
+                            Icons.description,
+                            size: 18,
+                            color: isOwnMessage
+                                ? (messageOptions.currentUserTextColor ??
+                                    Colors.white)
+                                : (messageOptions.textColor ?? Colors.black),
+                          )
+                        : loading,
+                  ),
+                  Flexible(
+                    child: Text(
+                      media.fileName.split('/').last,
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        color: isOwnMessage
+                            ? (messageOptions.currentUserTextColor ??
+                                Colors.white)
+                            : (messageOptions.textColor ?? Colors.black),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         );
     }
   }
