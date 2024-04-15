@@ -106,10 +106,9 @@ class MediaContainer extends StatelessWidget {
         );
       default:
         return InkWell(
-          onTap: () => launchUrl(
-            Uri.parse(media.fileName),
-            mode: LaunchMode.externalApplication,
-          ),
+          onTap: messageOptions.onTapMedia != null
+              ? () => messageOptions.onTapMedia!(media)
+              : null,
           child: TextContainer(
             isOwnMessage: isOwnMessage,
             messageOptions: messageOptions,
