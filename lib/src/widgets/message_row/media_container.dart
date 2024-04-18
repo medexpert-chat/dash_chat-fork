@@ -36,12 +36,17 @@ class MediaContainer extends StatelessWidget {
 
   /// Get the right media widget according to its type
   Widget _getMedia(ChatMedia media) {
-    final Widget loading = Container(
-      width: 15,
-      height: 15,
-      margin: const EdgeInsets.all(10),
-      child: const CircularProgressIndicator(),
-    );
+    Widget loading([double? value]) {
+      return Container(
+        width: 15,
+        height: 15,
+        margin: const EdgeInsets.all(10),
+        child: CircularProgressIndicator(
+          value: value,
+        ),
+      );
+    }
+
     switch (media.type) {
       case MediaType.audio:
         return Stack(
@@ -51,7 +56,7 @@ class MediaContainer extends StatelessWidget {
               key: ValueKey(media.url),
               url: media.url,
             ),
-            if (media.isUploading) loading
+            if (media.isUploading) loading()
           ],
         );
       case MediaType.video:
@@ -59,7 +64,7 @@ class MediaContainer extends StatelessWidget {
           alignment: AlignmentDirectional.bottomEnd,
           children: <Widget>[
             VideoPlayer(url: media.url),
-            if (media.isUploading) loading
+            if (media.isUploading) loading()
           ],
         );
       case MediaType.image:
@@ -67,8 +72,8 @@ class MediaContainer extends StatelessWidget {
           alignment: AlignmentDirectional.bottomEnd,
           children: <Widget>[
             GestureDetector(
-              onTap: messageOptions.onTapMedia != null
-                  ? () => messageOptions.onTapMedia!(media)
+              onTap: messageOptions.onTapImage != null
+                  ? () => messageOptions.onTapImage!(media)
                   : null,
               child: Image(
                 loadingBuilder: (context, child, event) {
@@ -101,8 +106,56 @@ class MediaContainer extends StatelessWidget {
                 image: _getImage(media.url),
               ),
             ),
-            if (media.isUploading) loading
+            if (media.isUploading) loading()
           ],
+        );
+      case MediaType.file:
+        return InkWell(
+          onTap: messageOptions.onTapFile != null
+              ? () => messageOptions.onTapFile!(media)
+              : null,
+          child: TextContainer(
+            isOwnMessage: isOwnMessage,
+            messageOptions: messageOptions,
+            message: message,
+            messageTextBuilder:
+                (ChatMessage m, ChatMessage? p, ChatMessage? n) {
+              return Row(
+                children: <Widget>[
+                  (messageOptions.loadingData != null &&
+                          messageOptions.loadingData!.isNotEmpty &&
+                          messageOptions.loadingData!.keys.first == media.url)
+                      ? loading(messageOptions.loadingData!.values.first)
+                      : Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: !media.isUploading
+                              ? Icon(
+                                  Icons.description,
+                                  size: 18,
+                                  color: isOwnMessage
+                                      ? (messageOptions.currentUserTextColor ??
+                                          Colors.white)
+                                      : (messageOptions.textColor ??
+                                          Colors.black),
+                                )
+                              : loading(),
+                        ),
+                  Flexible(
+                    child: Text(
+                      media.fileName.split('/').last,
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        color: isOwnMessage
+                            ? (messageOptions.currentUserTextColor ??
+                                Colors.white)
+                            : (messageOptions.textColor ?? Colors.black),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         );
       default:
         return InkWell(
@@ -129,7 +182,7 @@ class MediaContainer extends StatelessWidget {
                                     Colors.white)
                                 : (messageOptions.textColor ?? Colors.black),
                           )
-                        : loading,
+                        : loading(),
                   ),
                   Flexible(
                     child: Text(

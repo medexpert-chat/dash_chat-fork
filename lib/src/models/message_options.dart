@@ -24,7 +24,7 @@ class MessageOptions {
     this.messageTextBuilder,
     this.parsePatterns,
     this.textBeforeMedia = true,
-    this.onTapMedia,
+    this.onTapImage,
     this.showTime = true,
     this.showReadStatus = true,
     this.timeFormat,
@@ -36,6 +36,8 @@ class MessageOptions {
     this.resendIcon,
     this.onResend,
     this.onVisibilityChanges,
+    this.onTapFile,
+    this.loadingData,
   });
 
   final Function(ChatMessage)? onVisibilityChanges;
@@ -154,5 +156,9 @@ class MessageOptions {
 
   /// Function to call when the user clicks on a media
   /// Will not work with the default video player
-  final void Function(ChatMedia media)? onTapMedia;
+  final void Function(ChatMedia media)? onTapImage;
+
+  final void Function(ChatMedia media)? onTapFile;
+
+  final Map<String, double>? loadingData;
 }
