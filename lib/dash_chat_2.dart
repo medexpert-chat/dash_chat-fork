@@ -11,8 +11,6 @@ import 'package:intl/intl.dart' as intl;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart' as vp;
 
-import 'src/widgets/message_row/file_message.dart';
-
 part 'src/models/input_options.dart';
 part 'src/models/cursor_style.dart';
 part 'src/models/chat_user.dart';
