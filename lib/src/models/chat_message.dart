@@ -5,6 +5,7 @@ class ChatMessage {
   ChatMessage({
     this.id,
     required this.user,
+    this.groupChatUser,
     required this.createdAt,
     this.text = '',
     this.medias,
@@ -55,6 +56,8 @@ class ChatMessage {
 
   /// Author of the message
   ChatUser user;
+
+  GroupChatUser? groupChatUser;
 
   /// List of medias of the message
   List<ChatMedia>? medias;

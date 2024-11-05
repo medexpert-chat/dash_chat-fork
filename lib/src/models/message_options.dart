@@ -38,6 +38,7 @@ class MessageOptions {
     this.onVisibilityChanges,
     this.onTapFile,
     this.loadingData,
+    this.textStyleGroupUser,
   });
 
   final Function(ChatMessage)? onVisibilityChanges;
@@ -161,4 +162,6 @@ class MessageOptions {
   final void Function(ChatMedia media)? onTapFile;
 
   final Map<String, double>? loadingData;
+
+  final TextStyle? textStyleGroupUser;
 }

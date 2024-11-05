@@ -21,6 +21,7 @@ part 'src/models/chat_message.dart';
 part 'src/models/scroll_to_bottom_options.dart';
 part 'src/models/message_list_options.dart';
 part 'src/models/message_options.dart';
+part 'src/models/group_chat_user.dart';
 
 part 'src/dash_chat.dart';
 

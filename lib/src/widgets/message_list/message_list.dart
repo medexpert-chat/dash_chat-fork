@@ -11,6 +11,7 @@ class MessageList extends StatefulWidget {
     this.quickReplyOptions = const QuickReplyOptions(),
     this.scrollToBottomOptions = const ScrollToBottomOptions(),
     this.typingUsers,
+    this.isGroupChat = false,
     Key? key,
   }) : super(key: key);
 
@@ -36,6 +37,8 @@ class MessageList extends StatefulWidget {
 
   /// List of users currently typing in the chat
   final List<ChatUser>? typingUsers;
+
+  final bool isGroupChat;
 
   @override
   _MessageListState createState() => _MessageListState();
@@ -120,7 +123,7 @@ class _MessageListState extends State<MessageList> {
                                   color: widget.messages[i].id ==
                                           widget.messageListOptions
                                               .highlightedMessageId
-                                      ? Color.fromRGBO(21, 204, 171, 0.05)
+                                      ? const Color.fromRGBO(21, 204, 171, 0.05)
                                       : Colors.transparent,
                                   message: widget.messages[i],
                                   nextMessage: nextMessage,
@@ -130,6 +133,7 @@ class _MessageListState extends State<MessageList> {
                                   lastMessageBottomPadding: widget
                                       .messageListOptions
                                       .lastMessageBottomPadding,
+                                  isGroupChat: widget.isGroupChat,
                                 ),
                             ],
                           );
