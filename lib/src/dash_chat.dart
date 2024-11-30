@@ -15,6 +15,7 @@ class DashChat extends StatelessWidget {
     this.scrollToBottomOptions = const ScrollToBottomOptions(),
     this.readOnly = false,
     this.typingUsers,
+    this.isGroupChat = false,
     Key? key,
   }) : super(key: key);
 
@@ -52,6 +53,7 @@ class DashChat extends StatelessWidget {
   /// List of users currently typing in the chat
   final List<ChatUser>? typingUsers;
 
+  final bool isGroupChat;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -66,6 +68,7 @@ class DashChat extends StatelessWidget {
             scrollToBottomOptions: scrollToBottomOptions,
             typingUsers: typingUsers,
             onRefresh: onRefresh,
+            isGroupChat: isGroupChat,
           ),
         ),
         if (!readOnly)

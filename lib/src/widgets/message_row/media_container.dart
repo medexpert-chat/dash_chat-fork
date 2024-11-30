@@ -46,6 +46,7 @@ class MediaContainer extends StatelessWidget {
         ),
       );
     }
+
     switch (media.type) {
       case MediaType.audio:
         return Stack(
